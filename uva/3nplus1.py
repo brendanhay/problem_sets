@@ -63,7 +63,7 @@
 # [the official site](http://python.org/download/).
 #
 # Assuming your prompt is in the same location as the problem file
-# `./100/3nplus1.py`, you can run it with two numeric arguments:
+# `3nplus1.py`, you can run it with two numeric arguments:
 #
 #     $ python 3nplus1.py <i> <j>
 #

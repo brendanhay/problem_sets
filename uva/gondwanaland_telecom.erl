@@ -31,7 +31,7 @@
 %%     <td>C</td>
 %%     <td>0.53</td>
 %%     <td>0.33</td>
-%%     <td><0.13/td>
+%%     <td>0.13</td> 
 %%   </tr>
 %%   <tr>
 %%     <td>D</td>
@@ -46,7 +46,8 @@
 %%     <td>0.30</td>
 %%   </tr>
 %% </table>
-%% 
+%% <br/>
+%%
 %% All charges are in dollars per minute of the call. Calls which straddle a rate
 %% boundary are charged according to the time spent in each section. Thus a call
 %% starting at 5:58 pm and terminating at 6:04 pm will be charged for 2 minutes 
@@ -72,7 +73,7 @@
 %%
 %% <table>
 %%   <tr>
-%%     <th></th>
+%%     <th>Number</th>
 %%     <th>Day</th>
 %%     <th>Evening</th>
 %%     <th>Night</th>
@@ -95,7 +96,7 @@
 %% can be downloaded from [the official site](http://erlang.org/download.html).
 %%
 %% Assuming your prompt is in the same location as 
-%% the problem file `./120/flapjacks.erl`, you can compile it:
+%% the problem file `gondwanaland_telecom.erl`, you can compile it:
 %%
 %%     $ erl
 %%     1> c(gondwanaland_telecom).

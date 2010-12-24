@@ -56,7 +56,7 @@
 %% can be downloaded from [the official site](http://erlang.org/download.html).
 %%
 %% Assuming your prompt is in the same location as 
-%% the problem file `./120/flapjacks.erl`, you can compile it:
+%% the problem file `flapjacks.erl`, you can compile it:
 %%
 %%     $ erl
 %%     1> c(flapjacks).
