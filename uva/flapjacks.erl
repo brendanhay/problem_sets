@@ -85,6 +85,7 @@
 
 %% Start the pancake flipper by reading numeric space delimited input from 
 %% the term: `5 1 2 3 4`
+%%
 %% The first two lines of output are according to the brief,
 %% with the following two lines describing the final state
 %% of the stack and specific positions that were flipped.

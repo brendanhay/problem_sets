@@ -124,6 +124,11 @@
 -record(input, {step, number, start_hour, start_min, end_hour, end_min}).
 
 %% ### Exported Functions
+
+%% Start the problem by reading from the term an input according to the problem input,
+%% ie. `A 183-5724 17 58 18 04`
+%%
+%% The output is also according to the problem brief.
 -spec start() -> 'ok'.
 start() ->
     Input = read(),
