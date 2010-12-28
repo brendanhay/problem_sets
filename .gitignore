@@ -2,3 +2,5 @@
 *.pyc
 *.beam
 doc
+typer_ann
+*.ann*

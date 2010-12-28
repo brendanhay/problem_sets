@@ -1,4 +1,4 @@
-%% A semi-literate-programming Erlang solution for the **Stacks of Flapjacks** 
+%% A semi-literate-programming Erlang solution for the **Stacks of Flapjacks**   
 %% problem from [streamtech's](http://www.streamtech.nl/problemset/120.html) 
 %% problem set by [Brendan Hay](http://www.github.com/brendanhay).
 
@@ -88,6 +88,7 @@
 %% The first two lines of output are according to the brief,
 %% with the following two lines describing the final state
 %% of the stack and specific positions that were flipped.
+-spec start() -> 'ok'.
 start() ->
     Stack = read(),
     {Sorted, Ops} = sort(Stack),
@@ -102,6 +103,7 @@ start() ->
 %% a `tuple` consisting of the sorted result and the positions of the pancakes 
 %% that were flipped, which needs to be reversed to be in the correct order
 %% as the operations are recorded via prepending to the head.
+-spec sort([integer()]) -> {[integer()], [integer()]}.
 sort([])    -> {[], []};
 sort(Stack) -> 
     {Sorted, Ops} = sort(Stack, lists:sort(Stack)),
@@ -111,43 +113,54 @@ sort(Stack) ->
 
 %% Interpret a single line of input from stdin using `parse/1` and `clean/1` to 
 %% sanitise the input and turn it into a list of valid integers.
+-spec read() -> iolist().
 read() -> parse(clean(io:get_line("Pankcakes!: "))).
 
 %% Strip leading/trailing spaces and newlines from both ends of the input.
+-spec clean(iolist()) -> string().
 clean(Input) -> string:strip(string:strip(Input), both, $\n).
 
 %% Convert each token to a string accumulating the *valid* *unique* results by
 %% calling `validate/2` and `unique/1` respectively.
 %% Returns the first 30 diameters from the reversed accumulator once there are
 %% no more tokens to process.
+-spec parse(string()) -> [integer()].
 parse(Input)      -> parse(string:tokens(Input, " "), []).
 
-parse([H|T], Acc) -> parse(T, validate(string:to_integer(H), Acc));
-parse([], Acc)    -> uniques(lists:sublist(lists:reverse(Acc), 30)).
+-spec parse(list(), [integer()]) -> [integer()].
+parse([], Acc)    -> uniques(lists:sublist(lists:reverse(Acc), 30));
+parse([H|T], Acc) -> parse(T, validate(string:to_integer(H), Acc)).
 
 %% Filter the result of `string:to_integer/1` by accumulating valid integers 
 %% that are inside the range specified in the `guard` and ignoring all others.
+-spec validate({'error' | integer(), 'no_integer' | 'not_a_list' | string()}, 
+	       [pos_integer()]) -> [pos_integer()].
 validate({Int, _}, Acc) when is_integer(Int), Int >= 1, Int =< 100 -> [Int|Acc];
 validate(_, Acc)                                                   -> Acc.
 
-%% Create a duplicate free list via a highly inefficient but cute list comprehension.
+%% Create a duplicate free list via an inefficient but cute list comprehension.
+-spec uniques(list()) -> list().
 uniques([])    -> [];
 uniques([H|T]) -> [H | [X || X <- uniques(T), X /= H]].
 
 %% Format the number of operations (with a special case for `0`) according to
 %% question brief output. For example the operations: `4 5 3 0` becomes output: `1 2 3 0`.
+-spec count([integer()]) -> [integer()].
 count(Ops)              -> count(Ops, 1, []).
 
+-spec count([integer()], integer(), [integer()]) -> [integer()].
 count([], _, Acc)       -> lists:reverse(Acc);
 count([0|T], Iter, Acc) -> count(T, Iter, [0|Acc]);
 count([_|T], Iter, Acc) -> count(T, Iter + 1, [Iter|Acc]).
 
 %% Print the resulting pancake stack in a nicer 'non-erlang-termerised' format
 %% with a heading column by using the term formatter `~p` for each integer in the stack.
+-spec print([list()], string()) -> 'ok'.
 print(Stack, Heading) ->
     io:fwrite("~-12.s", [Heading ++ ":"]),
     print(Stack).
 
+-spec print([integer()]) -> 'ok'.
 print(Stack) ->
     io:fwrite(string:copies("~p ", length(Stack)) ++ "~n", Stack).
 
@@ -158,6 +171,7 @@ print(Stack) ->
 %% were used to transform the input stack -> output. `0` will be at the head
 %% of the list indicating that the stack was sorted according to the order
 %% specification that was passed in.
+-spec sort([integer()], [integer()]) -> {[integer()], [integer()]}.
 sort([], _)              -> {[], [0]};
 sort(Stack, Stack)       -> {Stack, [0]};
 sort(Stack=[H|_], Order) ->
@@ -171,6 +185,7 @@ sort(Stack=[H|_], Order) ->
     {NewStack, CompletedOps} = flip(Ops, Stack),
     sort(Length - 1, NewStack, Order, CompletedOps).
 
+-spec sort(integer(), [integer()],  [integer()],  [integer()]) -> { [integer()],  [integer()]}.
 sort(_, [], _, Ops)           -> {[], Ops};
 sort(1, Stack, _, Ops)        -> {Stack, Ops};
 sort(_, Stack, Stack, Ops)    -> {Stack, [0|Ops]};
@@ -180,6 +195,7 @@ sort(Iter, Stack, Order, Ops) ->
 
 %% Find the position of a flapjack in the stack by recursively pattern matching
 %% on each element of the list from left to right.
+-spec position(integer(), [integer()]) -> integer().
 position(_, [])     -> -1; 
 position(N, [N|_])  -> 1; 
 position(N, [_|T])  -> position(N, T) + 1. 
@@ -189,8 +205,10 @@ position(N, [_|T])  -> position(N, T) + 1.
 %% as an operation. The list is split using `lists:split/2` and then the top part 
 %% (the sub-stack on the spatula) is reversed using `lists:reverse/1`, the position 
 %% is then either accumulated or return as the operation performed.
+-spec flip([integer()], [integer()]) -> {[integer()], [integer()]}.
 flip(Input, Stack)         -> flip(Input, Stack, []).
 
+-spec flip([integer()] | integer(), [integer()], [integer()]) -> {[integer()], [integer()]}.
 flip([], Stack, Ops)       -> {Stack, Ops};
 flip(1, Stack, Ops)        -> {Stack, Ops};
 flip([H|T], Stack, Ops)    -> 

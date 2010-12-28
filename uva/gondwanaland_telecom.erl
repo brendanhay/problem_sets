@@ -116,10 +116,107 @@
 
 %% ### Module Definition
 
-%% Export everything during development.
+%% `start/0` is exported as the top-level entry point.
 -module(gondwanaland_telecom).
--compile(export_all).
+-export([start/0]).
+
+%% Record specifying how the input line is deconstructed.
+-record(input, {step, number, start_hour, start_min, end_hour, end_min}).
 
 %% ### Exported Functions
+-spec start() -> 'ok'.
+start() ->
+    Input = read(),
+    Durations = durations(Input),
+    Cost = cost(Input#input.step, Durations),    
+    print(Input, Durations, Cost).
 
 %% ### Internal Functions
+
+%% Interpret a single line of input from stdin using `parse/1` and `clean/1` to 
+%% sanitise the input and turn it into a valid input record.
+-spec read() -> #input{}.    
+read() -> parse(clean(io:get_line("Call: "))).
+
+%% Strip leading/trailing spaces and newlines from both ends of the input.
+-spec clean(iolist()) -> string().
+clean(Input) -> string:strip(string:strip(Input), both, $\n).
+
+%% Convert a string or iolist into a binary, recursing over each `time`
+%% after desconstructing the intial `step` and `number`.
+-spec parse(binary() | iolist()) -> #input{}.
+parse(<<Step:8, " ", Number:64/bitstring, T/binary>>) -> 
+    parse(T, [Step, binary_to_list(Number)]);
+parse(String) -> 
+    parse(list_to_binary(String)).
+
+-spec parse(binary(), list()) -> #input{}.
+parse(<<>>, Acc) -> 
+    list_to_tuple([input|Acc]);
+parse(<<" ", Time:16/bitstring, T/binary>>, Acc) ->
+    parse(T, Acc ++ [list_to_integer(binary_to_list(Time))]).
+
+%% Print the ouput according to the problem brief.
+-spec print(#input{}, [tuple()], number()) -> 'ok'.
+print(#input{step=Step, number=Number}, Durations, Cost) ->
+    Data = [Number, [D || {_, D} <- Durations], Step, Cost],
+    io:fwrite("~s ~p ~c ~-5.2f~n", Data).
+
+%% Calculate the total calling time for each time range, passing the potentially
+%% modified start hour/minutes from the previous function ala function 
+%% composition like so:
+%%
+%%     evening(day(night()))
+%%
+%% Returning a list of `{range, duration}` tuples.
+-spec durations(#input{}) -> [{atom(), number()}].    
+durations({input, _, _, SH, SM, EH, EM}) ->
+    durations([night, day, evening], {SH, SM, EH, EM}, []).
+
+-spec durations([atom()], tuple(), [{atom(), number()}]) -> [{atom(), number()}].
+durations([], _, Acc)        -> Acc;
+durations([H|T], Times, Acc) -> 
+    {Duration, ModTimes} = calculate(H, Times),
+    durations(T, ModTimes, [{H, Duration}|Acc]).
+
+%% Calculate the duration of the call in the a time range, returning the 
+%% duration and a potentially updated set of start hour/minutes.
+%% 
+%% The time ranges are calculated as follows:
+%%
+%%     Day: 8:00 - 17:59
+%%     Evening: 18:00 - 21:59
+%%     Night: 22:00 - 7:59
+%%
+-spec calculate(atom(), tuple()) -> {number(), tuple()}.    
+calculate(night, {SH, SM, EH, EM}) when SH < 8, EH >= 8 ->
+    {(SH - 8) * 60 - SM, {8, 0, EH, EM}};
+calculate(night, {SH, SM, EH, EM}=Times) when SH < 8 ->
+    {(EH - SH) * 60 + EM - SM, Times};
+calculate(day, {SH, SM, EH, EM}) when EH >= 18, SH < 18 ->
+    {(18 - SH) * 60 - SM, {18, 0, EH, EM}};
+calculate(day, {SH, SM, EH, EM}=Times) when EH >= 8, SH < 18 ->
+    {(EH - SH) * 60 + EM - SM, Times};
+calculate(evening, {SH, SM, EH, EM}) when EH >= 22, SH < 22 ->
+    {(22 - SH) * 60 - SM, {22, 0, EH, EM}};
+calculate(evening, {SH, SM, EH, EM}=Times) when EH >= 18, SH < 22 ->
+    {(EH - SH) * 60 + EM - SM, Times};
+calculate(_, Times) ->
+    {0, Times}.
+
+%% Calculate the cost for a specific step given a list of `{range, duration}` tuples.
+-spec cost(char(), [{atom(), number()}]) -> number().
+cost(Step, Durations)                    -> cost(Step, Durations, 0).    
+
+-spec cost(char(), [{atom(),number()}], number()) -> number().
+cost(_, [], Total)                       -> Total;
+cost(Step, [{Range, Duration}|T], Total) -> cost(Step, T, Duration * rate(Step, Range) + Total).
+
+%% Get the calling rate keyed by charging step for each of respective time ranges.
+-spec rate(char(), day | evening | night) -> float().
+rate(Step, Range) -> lists:nth(abs($A - Step) + 1, rates(Range)).
+
+-spec rates(day | evening | night) -> [float()].    
+rates(day)     -> [0.10, 0.25, 0.53, 0.87, 1.44];
+rates(evening) -> [0.06, 0.15, 0.33, 0.47, 0.80];
+rates(night)   -> [0.02, 0.05, 0.13, 0.17, 0.30].
