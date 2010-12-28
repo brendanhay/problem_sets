@@ -1,6 +1,6 @@
 \#*#
 *.pyc
 *.beam
-doc
+docs
 typer_ann
 *.ann*
