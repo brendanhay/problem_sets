@@ -73,12 +73,14 @@ def parse(file_name):
 # Count the number of possible movements for the combination of `a, b, c` of which
 # each represent a different bottle color group in a seperate bin.
 def count_moves(bottles):
+    # Inner function used as sugar so the list of bottles only
+    # needs to be passed in once to the parent.
     def moves(a, b, c):
         return sum([bottles[i] for i in range(len(bottles)) if i not in [a, b, c]])
     
     return moves
 
-# Find the best lowest number of movements and the best possible combination
+# Find the lowest number of movements and the best possible combination
 # by brute forcing over possible bottle color permutations.
 def best_combination(bottles):
     moves = count_moves(bottles)
@@ -97,7 +99,7 @@ def best_combination(bottles):
     for combination, moves in movements.items():
         if moves < minimum:
             combo, minimum = combination, moves
-
+ 
     return combo, min_moves
 
 # Open and parse the `ecological_bin_packing.txt` file, printing the resulting
