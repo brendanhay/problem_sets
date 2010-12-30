@@ -59,7 +59,7 @@
 #
 
 # ### Running
-# Python 2.7 is required, and can be downloaded from
+# Python is required, and can be downloaded from
 # [the official site](http://python.org/download/).
 #
 # Assuming your prompt is in the same location as the problem file
@@ -81,8 +81,8 @@
 # due to point `1.` above. In the end, despite the feeling it could be
 # considerably more performant, the solution is simple. Who doesn't love brute force?
 
-# The `argparse` module from `Python 2.7` is used to parse the command line args.
-import argparse
+# `sys` module used to handle command-line arguments.
+import sys
 
 # Recursive function definition of the problem brief's algorithm 
 def cycle(current, count=1):
@@ -114,14 +114,8 @@ def main(i, j):
 
     print i, j, max_cycles(i, j)
 
-# Setup the argument parser and command-line options, and then run the program
-# with the parsed inputs.
+# Obtain `i` and `j` from the command-line arguments.
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='The 3n+1 Problem. \
-        The range will be the difference between the two supplied bounds.')
-    parser.add_argument('i', type=int, help='First bound of the problem range.')
-    parser.add_argument('j', type=int, help='Second bound.')
-    args = parser.parse_args()
-    main(args.i, args.j)
+    main(sys.argv[1], sys.argv[2])
     
     
