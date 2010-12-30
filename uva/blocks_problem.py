@@ -94,9 +94,7 @@ class Blocks():
 
     # Reset any blocks following contained in `stack` to their original positions.
     def __reset_stack(self, stack, block):
-        blocks = self.stacks[stack]
-
-        for b in blocks:
+        for b in self.stacks[stack]:
             self.stacks[b] = [b]
 
     # Move a block and any followers from `stack_from` to `stack_to` via ginsu slicing.
@@ -129,7 +127,7 @@ class Blocks():
     def execute(self):
         for command, a, b in self.commands:
             if a != b:
-                getattr(self, command)(a, b)
+                getattr(self, command)(a, b) 
 
     # *move a onto b*
     def move_onto(self, a, b):
