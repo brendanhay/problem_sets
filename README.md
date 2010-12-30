@@ -1,1 +1,1 @@
-http://brendanhay.github.com/ProblemSets/
+[Literate documentation](http://brendanhay.github.com/ProblemSets/)
