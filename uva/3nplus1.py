@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 # A semi-literate-programming Python solution for the **3n + 1**
-# problem from [streamtech's](http:#www.streamtech.nl/problemset/100.html) 
-# problem set by [Brendan Hay](http:#www.github.com/brendanhay). 
+# problem from [streamtech's](http://www.streamtech.nl/problemset/100.html) 
+# problem set by [Brendan Hay](http://www.github.com/brendanhay). 
 
 # ### Brief 
 # #### Background

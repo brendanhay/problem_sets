@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 # A semi-literate-programming Python solution for the **Ecological Bin Packing**
-# problem from [streamtech's](http:#www.streamtech.nl/problemset/102.html) 
-# problem set by [Brendan Hay](http:#www.github.com/brendanhay). 
+# problem from [streamtech's](http://www.streamtech.nl/problemset/102.html) 
+# problem set by [Brendan Hay](http://www.github.com/brendanhay). 
 
 # ### Brief 
 # #### Background

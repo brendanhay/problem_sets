@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 # A semi-literate-programming Python solution for the **Blocks Problem**
-# problem from [streamtech's](http:#www.streamtech.nl/problemset/101.html) 
-# problem set by [Brendan Hay](http:#www.github.com/brendanhay). 
+# problem from [streamtech's](http://www.streamtech.nl/problemset/101.html) 
+# problem set by [Brendan Hay](http://www.github.com/brendanhay). 
 
 # ### Brief 
 # #### Background
