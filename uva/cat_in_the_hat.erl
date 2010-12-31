@@ -113,20 +113,18 @@ count(Cats)                       -> count(Cats, []).
 count([], Acc)                    -> Acc;
 count([{Height, Workers}|T], Acc) -> count(T, [measure(Height, Workers)|Acc]).
 
-%% Handle `Height: 1, Workers: 1` seperately as the following algorithm in `measure/2`
-%% doesn't work for this case.
+%% Handle `Height: 1, Workers: 1` seperately as `measure/3` doesn't work for this case.
 measure(Height, 1)       -> K = math:log(Height) / math:log(2), {Height, 1, K, K};
 measure(Height, Workers) -> measure(Height, Workers, 2).
 
 %% Measure the number of cat's inside any cat with a height greater than 1's hat, and
 %% the number of workers.
 %%
-%% Since I'm dealing with floats, I can't use `lists:seq` and other range operators 
-%% I would normally use when I need some kind of index `N`.
+%% `K` is the number of cats inside each (non-smallest) cat's hat.
+%% `T` is the number of cats with different heights.
 %%
-%% K is the number of cats inside each (non-smallest) cat's hat.
-%%
-%% T is the number of cats with different heights.
+%% Since I'm dealing with floats, I can't use `lists:seq` and other range operators, 
+%% hence the use of index `N`. 
 measure(Height, Workers, N) ->
     K = math:log(Workers) / math:log(N),
     T = math:pow(N + 1, K) - Height,
