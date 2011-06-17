@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>a_change_in_thermal_unit.rb</title>
+  <link rel="stylesheet" href="http://jashkenas.github.com/docco/resources/docco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>a_change_in_thermal_unit.rb</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-2'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-2">&#182;</a>
+        </div>
+        <p>A semi-literate-programming Ruby solution for the <strong>A Change in Thermal Unit</strong>
+problem from <a href="http://uva.onlinejudge.org/index.php?option=com_onlinejudge&amp;Itemid=8&amp;category=84&amp;page=show_problem&amp;problem=3135">UVa Online Judge&rsquo;s</a>
+problem set by <a href="http://www.github.com/brendanhay">Brendan Hay</a>.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre></pre></div>
+      </td>
+    </tr>
+    <tr id='section-Brief'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-Brief">&#182;</a>
+        </div>
+        <h3>Brief</h3>
+
+<h4>Background</h4>
+
+<p>Measuring temperature and temperature differences are common task in many research and applications.
+Unfortunately, there exists more than one unit of measuring temperatures.
+This introduces a lot of confusion at times.
+Two popular units of measurements are Celsius (<code>C</code>) and Fahrenheit (<code>F</code>).
+The conversion of <code>F</code> from <code>C</code> is given by the formula:</p>
+
+<pre><code>F = 9/5 C + 32
+</code></pre>
+
+<p>In this problem, you will be given an initial temperature in <code>C</code> and an increase in temperature in <code>F</code>.
+You would have to calculate the new temperature in <code>C</code>.</p>
+
+<h4>Input</h4>
+
+<p>Input starts with an integer <code>T (≤ 100)</code>, denoting the number of test cases.
+Each case contains a line with two integers <code>C</code> and <code>d (0 ≤ C, d ≤ 100)</code>, where <code>C</code> represents the initial temperature in Celsius and <code>d</code> represents the increase in temperature in Fahrenheit.</p>
+
+<pre><code>2
+100 0
+0 100
+</code></pre>
+
+<h4>Output</h4>
+
+<p>For each case, print the case number and the new temperature in Celsius after rounding
+it to two digits after the decimal point.</p>
+
+<pre><code>Case 1: 100.00
+Case 2: 55.56
+</code></pre>
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="nb">require</span> <span class="s1">&#39;scanf&#39;</span>
+
+<span class="n">cases</span><span class="p">,</span> <span class="o">=</span> <span class="n">scanf</span> <span class="s1">&#39;%d&#39;</span>
+
+<span class="no">Range</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">cases</span><span class="p">)</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span>
+  <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">scanf</span> <span class="s1">&#39;%d %d&#39;</span>
+  <span class="nb">puts</span> <span class="s2">&quot;Case </span><span class="si">#{</span><span class="n">i</span><span class="si">}</span><span class="s2">: %.2f&quot;</span> <span class="o">%</span> <span class="p">((((((</span><span class="mi">9</span><span class="o">.</span><span class="mi">0</span><span class="o">/</span><span class="mi">5</span><span class="o">.</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">c</span> <span class="o">+</span> <span class="mi">32</span><span class="p">)</span> <span class="o">+</span> <span class="n">d</span><span class="p">)</span> <span class="o">-</span> <span class="mi">32</span><span class="p">)</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)</span> <span class="o">/</span> <span class="mi">9</span><span class="p">)</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
