@@ -33,4 +33,11 @@
 #     Case 1: 100.00
 #     Case 2: 55.56
 
- 
+require 'scanf'
+
+cases, = scanf '%d'
+
+Range.new(1, cases).each do |i|
+  c, d = scanf '%d %d'
+  puts "Case #{i}: %.2f" % ((((((9.0/5.0) * c + 32) + d) - 32) * 5) / 9)
+end
