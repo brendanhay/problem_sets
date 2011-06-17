@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>problem_89.erl</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id="background"></div>
+<div id='container'>
+  
+  <div class='section'>
+    <div class='docs'><h1>problem_89.erl</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      <p>A semi-literate-programming Erlang solution for
+<a href="http://projecteuler.net/index.php?section=problems&amp;id=89">Project Euler</a> <strong>Problem 89</strong> 
+by <a href="http://www.github.com/brendanhay">Brendan Hay</a>.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <h3>Brief</h3>
+<p>The rules for writing Roman numerals allow for many ways of writing each number (see FAQ: Roman Numerals). However, there is always a "best" way of writing a particular number.
+For example, the following represent all of the legitimate ways of writing the number sixteen:</p>
+<pre><code> IIIIIIIIIIIIIIII
+ VIIIIIIIIIII
+ VVIIIIII
+ XIIIIII
+ VVVI
+ XVI
+</code></pre>
+<p>The last example being considered the most efficient, as it uses the least number of numerals.
+The 11K text file, roman.txt, contains one thousand numbers written in valid, but not necessarily minimal, Roman numerals; that is, they are arranged in descending units and obey the subtractive pair rule (see FAQ for the definitive rules for this problem).
+Find the number of characters saved by writing each of these in their minimal form.</p>
+<p><strong>Note:</strong> You can assume that all the Roman numerals in the file contain no more than four consecutive identical units.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <h3>Running</h3>
+<p>Erlang is required, sources and binaries for various environments 
+can be downloaded from <a href="http://erlang.org/download.html">the official site</a>.</p>
+<p>Assuming your prompt is in the same location as 
+the problem file <code>flapjacks.erl</code>, you can compile it:</p>
+<pre><code>$ erl
+1&gt; c(problem_89).
+</code></pre>
+<p>You should see the following, indicating successful compilation:</p>
+<pre><code>{ok,problem_89}
+</code></pre>
+<p>The problem can then be run:</p>
+<pre><code>2&gt; problem_89:compute().
+</code></pre>
+<p>Which will read the problem file <code>roman.txt</code> from the curent working directory
+and print the computed result.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <h3>Module Definition</h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p><code>compute/0</code> is exported as the top level entry point to calculate the resulting character
+savings by reducing the lines in <code>roman.txt</code> to their most efficient form.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">module</span><span class="p">(</span><span class="n">problem_89</span><span class="p">).</span>
+<span class="p">-</span><span class="ni">export</span><span class="p">([</span><span class="n">compute</span><span class="o">/</span><span class="mi">0</span><span class="p">]).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <p>A list of tuples containing the match and optimum replacement value which is used
+to reduce numerals to their most efficient forms.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">define</span><span class="p">(</span><span class="no">NUMERALS</span><span class="p">,</span> <span class="p">[{</span><span class="o">&lt;&lt;</span><span class="s">&quot;DCCCC&quot;</span><span class="o">&gt;&gt;</span><span class="p">,</span> <span class="o">&lt;&lt;</span><span class="s">&quot;CM&quot;</span><span class="o">&gt;&gt;</span><span class="p">},</span> 
+		   <span class="p">{</span><span class="o">&lt;&lt;</span><span class="s">&quot;LXXXX&quot;</span><span class="o">&gt;&gt;</span><span class="p">,</span> <span class="o">&lt;&lt;</span><span class="s">&quot;XC&quot;</span><span class="o">&gt;&gt;</span><span class="p">},</span> 
+		   <span class="p">{</span><span class="o">&lt;&lt;</span><span class="s">&quot;VIIII&quot;</span><span class="o">&gt;&gt;</span><span class="p">,</span> <span class="o">&lt;&lt;</span><span class="s">&quot;IX&quot;</span><span class="o">&gt;&gt;</span><span class="p">},</span>
+		   <span class="p">{</span><span class="o">&lt;&lt;</span><span class="s">&quot;IIII&quot;</span><span class="o">&gt;&gt;</span><span class="p">,</span> <span class="o">&lt;&lt;</span><span class="s">&quot;IV&quot;</span><span class="o">&gt;&gt;</span><span class="p">},</span> 
+		   <span class="p">{</span><span class="o">&lt;&lt;</span><span class="s">&quot;XXXX&quot;</span><span class="o">&gt;&gt;</span><span class="p">,</span> <span class="o">&lt;&lt;</span><span class="s">&quot;XL&quot;</span><span class="o">&gt;&gt;</span><span class="p">},</span> 
+		   <span class="p">{</span><span class="o">&lt;&lt;</span><span class="s">&quot;CCCC&quot;</span><span class="o">&gt;&gt;</span><span class="p">,</span> <span class="o">&lt;&lt;</span><span class="s">&quot;CD&quot;</span><span class="o">&gt;&gt;</span><span class="p">}]).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <h3>Exported Functions</h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>Accrues the original and modified numerals from <code>roman.txt</code> into two binaries, streaming
+lines and modifying them as read. The output is the difference between the original and 
+modified version of the file contents, which is the number of characters saved by 
+performing the reduction/replacements.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nf">compute</span><span class="p">()</span> <span class="o">-&gt;</span>
+    <span class="p">{</span><span class="nv">Original</span><span class="p">,</span> <span class="nv">Modified</span><span class="p">}</span> <span class="o">=</span> <span class="n">map_lines</span><span class="p">(</span><span class="s">&quot;roman.txt&quot;</span><span class="p">,</span> <span class="k">fun</span> <span class="n">replace</span><span class="o">/</span><span class="mi">1</span><span class="p">),</span>
+    <span class="nb">byte_size</span><span class="p">(</span><span class="nv">Original</span><span class="p">)</span> <span class="o">-</span> <span class="nb">byte_size</span><span class="p">(</span><span class="nv">Modified</span><span class="p">).</span>   </pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <h3>Internal Functions</h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p>Open <code>Path</code> in <code>read</code> and <code>binary</code> mode for a small performance gain when performing 
+stripping and match replacement on individual lines.<br />
+</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nf">map_lines</span><span class="p">(</span><span class="nv">Path</span><span class="p">,</span> <span class="nv">Fun</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="p">{</span><span class="n">ok</span><span class="p">,</span> <span class="nv">Device</span><span class="p">}</span> <span class="o">=</span> <span class="nn">file</span><span class="p">:</span><span class="n">open</span><span class="p">(</span><span class="nv">Path</span><span class="p">,</span> <span class="p">[</span><span class="n">read</span><span class="p">,</span> <span class="n">binary</span><span class="p">]),</span>
+    <span class="n">map_line</span><span class="p">(</span><span class="nv">Device</span><span class="p">,</span> <span class="nv">Fun</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[]).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p>For each line until <code>eof</code> is received accumulate the original line, and the result of
+applying <code>Fun</code>. Both results are cleaned using <code>clean/1</code> to remove the trailing <code>\n</code>.
+<code>list_to_binary/1</code> is called to flatten each returned deep list into a <code>binary</code>.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nf">map_line</span><span class="p">(</span><span class="nv">Device</span><span class="p">,</span> <span class="nv">Fun</span><span class="p">,</span> <span class="nv">Original</span><span class="p">,</span> <span class="nv">Modified</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="k">case</span> <span class="nn">io</span><span class="p">:</span><span class="n">get_line</span><span class="p">(</span><span class="nv">Device</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)</span> <span class="k">of</span>
+        <span class="n">eof</span>  <span class="o">-&gt;</span> 
+	    <span class="nn">file</span><span class="p">:</span><span class="n">close</span><span class="p">(</span><span class="nv">Device</span><span class="p">),</span>
+	    <span class="p">{</span><span class="nb">list_to_binary</span><span class="p">(</span><span class="nv">Original</span><span class="p">),</span> <span class="nb">list_to_binary</span><span class="p">(</span><span class="nv">Modified</span><span class="p">)};</span>
+        <span class="nv">Line</span> <span class="o">-&gt;</span> 
+	    <span class="n">map_line</span><span class="p">(</span><span class="nv">Device</span><span class="p">,</span> <span class="nv">Fun</span><span class="p">,</span> <span class="p">[</span><span class="n">clean</span><span class="p">(</span><span class="nv">Line</span><span class="p">)|</span><span class="nv">Original</span><span class="p">],</span> <span class="p">[</span><span class="n">clean</span><span class="p">(</span><span class="nv">Fun</span><span class="p">(</span><span class="nv">Line</span><span class="p">))|</span><span class="nv">Modified</span><span class="p">])</span>
+    <span class="k">end</span><span class="p">.</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <p>Applied to a <code>binary</code> it performs a replacement using a <code>{Match, Replace}</code> tuple 
+from the <code>?NUMERALS</code> macro defined above. <code>binary:replace/4</code> is defined in native code.
+Every <code>{Match, Replace}</code> tuple is applied to <code>Bin</code> from left to right to get 
+the final modified <code>binary</code>.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nf">replace</span><span class="p">(</span><span class="nv">Bin</span><span class="p">)</span> <span class="o">-&gt;</span> 
+    <span class="nv">Fold</span> <span class="o">=</span> <span class="k">fun</span><span class="p">({</span><span class="nv">Match</span><span class="p">,</span> <span class="nv">Replace</span><span class="p">},</span> <span class="nv">B</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nn">binary</span><span class="p">:</span><span class="n">replace</span><span class="p">(</span><span class="nv">B</span><span class="p">,</span> <span class="nv">Match</span><span class="p">,</span> <span class="nv">Replace</span><span class="p">,</span> <span class="p">[])</span> <span class="k">end</span><span class="p">,</span>
+    <span class="nn">lists</span><span class="p">:</span><span class="n">foldl</span><span class="p">(</span><span class="nv">Fold</span><span class="p">,</span> <span class="nv">Bin</span><span class="p">,</span> <span class="no">?NUMERALS</span><span class="p">).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      <p>Removes the last character of a <code>binary</code>.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nf">clean</span><span class="p">(</span><span class="nv">Bin</span><span class="p">)</span> <span class="o">-&gt;</span> 
+    <span class="nn">binary</span><span class="p">:</span><span class="n">part</span><span class="p">(</span><span class="nv">Bin</span><span class="p">,</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="nb">byte_size</span><span class="p">(</span><span class="nv">Bin</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">}).</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

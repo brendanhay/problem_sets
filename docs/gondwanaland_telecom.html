@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>gondwanaland_telecom.erl</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id="background"></div>
+<div id='container'>
+  
+  <div class='section'>
+    <div class='docs'><h1>gondwanaland_telecom.erl</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      <p>A semi-literate-programming Erlang solution for the <strong>Gondwanaland Telecom</strong> 
+problem from <a href="http://www.streamtech.nl/problemset/145.html">streamtech's</a> 
+problem set by <a href="http://www.github.com/brendanhay">Brendan Hay</a>.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <h3>Brief</h3>
+<h4>Background</h4>
+<p>Gondwanaland Telecom makes charges for calls according to distance and time of day.
+The basis of the charging is contained in the following schedule, where the 
+charging step is related to the distance:</p>
+<table>
+  <tr>
+    <th>Charging Step (distance)</th>
+    <th>Day Rate 8am to 6pm</th>
+    <th>Evening Rate 6pm to 10pm</th>
+    <th>Night Rate 10pm to 8am</th>
+  </tr>
+  <tr>
+    <td>A</td>
+    <td>0.10</td>
+    <td>0.06</td>
+    <td>0.02</td>
+  </tr>
+  <tr>
+    <td>B</td>
+    <td>0.25</td>
+    <td>0.15</td>
+    <td>0.05</td>
+  </tr>
+  <tr>
+    <td>C</td>
+    <td>0.53</td>
+    <td>0.33</td>
+    <td>0.13</td> 
+  </tr>
+  <tr>
+    <td>D</td>
+    <td>0.87</td>
+    <td>0.47</td>
+    <td>0.17</td>
+  </tr>
+  <tr>
+    <td>E</td>
+    <td>1.44</td>
+    <td>0.80</td>
+    <td>0.30</td>
+  </tr>
+</table>
+
+<br/>
+
+<p>All charges are in dollars per minute of the call. Calls which straddle a rate
+boundary are charged according to the time spent in each section. Thus a call
+starting at 5:58 pm and terminating at 6:04 pm will be charged for 2 minutes 
+at the day rate and for 4 minutes at the evening rate. Calls less than a minute
+ are not recorded and no call may last more than 24 hours.
+Write a program that reads call details and calculates the corresponding charges.</p>
+<h4>Input</h4>
+<p>Input lines will consist of the charging step (upper case letter 'A'..'E'), 
+the number called (a string of 7 digits and a hyphen in the approved format) 
+and the start and end times of the call, all separated by exactly one blank. 
+Times are recorded as hours and minutes in the 24 hour clock, separated by one 
+blank and with two digits for each number. Input will be terminated by a line
+consisting of a single #.</p>
+<pre><code>A 183-5724 17 58 18 04
+#
+</code></pre>
+<h4>Output</h4>
+<p>Output will consist of the called number, the time in minutes the call spent 
+in each of the charge categories, the charging step and the total cost in the
+format shown below.</p>
+<table>
+  <tr>
+    <th>Number</th>
+    <th>Day</th>
+    <th>Evening</th>
+    <th>Night</th>
+    <th>Step</th>
+    <th>Cost</th>
+  </tr>
+  <tr>
+    <td>183-5724</td>
+    <td>2</td>
+    <td>4</td>
+    <td>0</td>
+    <td>A</td>
+    <td>0.44</td>
+  </tr>
+</table>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <h3>Running</h3>
+<p>Erlang is required, sources and binaries for various environments 
+can be downloaded from <a href="http://erlang.org/download.html">the official site</a>.</p>
+<p>Assuming your prompt is in the same location as 
+the problem file <code>gondwanaland_telecom.erl</code>, you can compile it:</p>
+<pre><code>$ erl
+1&gt; c(gondwanaland_telecom).
+</code></pre>
+<p>You should see the following, indicating successful compilation:</p>
+<pre><code>{ok,gondwanaland_telecom}
+</code></pre>
+<p>The problem can then be run:</p>
+<pre><code>2&gt; gondwanaland_telecom:start().
+</code></pre>
+<p>And finally, it will prompt for an input string according to the problem brief (ie. <code>A 183-5724 17 58 18 04</code>):</p>
+<pre><code>Call:
+</code></pre>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <h3>Module Definition</h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p><code>start/0</code> is exported as the top-level entry point.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">module</span><span class="p">(</span><span class="n">gondwanaland_telecom</span><span class="p">).</span>
+<span class="p">-</span><span class="ni">export</span><span class="p">([</span><span class="n">start</span><span class="o">/</span><span class="mi">0</span><span class="p">]).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <p>Record specifying how the input line is deconstructed.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">record</span><span class="p">(</span><span class="nl">input</span><span class="p">,</span> <span class="p">{</span><span class="n">step</span><span class="p">,</span> <span class="n">number</span><span class="p">,</span> <span class="n">start_hour</span><span class="p">,</span> <span class="n">start_min</span><span class="p">,</span> <span class="n">end_hour</span><span class="p">,</span> <span class="n">end_min</span><span class="p">}).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <h3>Exported Functions</h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>Start the problem by reading from the term an input according to the problem input,
+ie. <code>A 183-5724 17 58 18 04</code></p>
+<p>The output is also according to the problem brief.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">start</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">&#39;ok&#39;</span><span class="p">.</span>
+<span class="nf">start</span><span class="p">()</span> <span class="o">-&gt;</span>
+    <span class="nv">Input</span> <span class="o">=</span> <span class="n">read</span><span class="p">(),</span>
+    <span class="nv">Durations</span> <span class="o">=</span> <span class="n">durations</span><span class="p">(</span><span class="nv">Input</span><span class="p">),</span>
+    <span class="nv">Cost</span> <span class="o">=</span> <span class="n">cost</span><span class="p">(</span><span class="nv">Input</span><span class="nl">#input.step</span><span class="p">,</span> <span class="nv">Durations</span><span class="p">),</span>    
+    <span class="n">print</span><span class="p">(</span><span class="nv">Input</span><span class="p">,</span> <span class="nv">Durations</span><span class="p">,</span> <span class="nv">Cost</span><span class="p">).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <h3>Internal Functions</h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p>Interpret a single line of input from stdin using <code>parse/1</code> and <code>clean/1</code> to 
+sanitise the input and turn it into a valid input record.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">read</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nl">#input</span><span class="p">{}.</span>    
+<span class="nf">read</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">parse</span><span class="p">(</span><span class="n">clean</span><span class="p">(</span><span class="nn">io</span><span class="p">:</span><span class="n">get_line</span><span class="p">(</span><span class="s">&quot;Call: &quot;</span><span class="p">))).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p>Strip leading/trailing spaces and newlines from both ends of the input.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">clean</span><span class="p">(</span><span class="n">iolist</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="n">string</span><span class="p">().</span>
+<span class="nf">clean</span><span class="p">(</span><span class="nv">Input</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nn">string</span><span class="p">:</span><span class="n">strip</span><span class="p">(</span><span class="nn">string</span><span class="p">:</span><span class="n">strip</span><span class="p">(</span><span class="nv">Input</span><span class="p">),</span> <span class="n">both</span><span class="p">,</span> <span class="sc">$\n</span><span class="p">).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <p>Convert a string or iolist into a binary, recursing over each <code>time</code>
+after desconstructing the intial <code>step</code> and <code>number</code>.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">parse</span><span class="p">(</span><span class="n">binary</span><span class="p">()</span> <span class="p">|</span> <span class="n">iolist</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="nl">#input</span><span class="p">{}.</span>
+<span class="nf">parse</span><span class="p">(</span><span class="o">&lt;&lt;</span><span class="nv">Step</span><span class="p">:</span><span class="mi">8</span><span class="p">,</span> <span class="s">&quot; &quot;</span><span class="p">,</span> <span class="nv">Number</span><span class="p">:</span><span class="mi">64</span><span class="o">/</span><span class="n">bitstring</span><span class="p">,</span> <span class="nv">T</span><span class="o">/</span><span class="n">binary</span><span class="o">&gt;&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> 
+    <span class="n">parse</span><span class="p">(</span><span class="nv">T</span><span class="p">,</span> <span class="p">[</span><span class="nv">Step</span><span class="p">,</span> <span class="nb">binary_to_list</span><span class="p">(</span><span class="nv">Number</span><span class="p">)]);</span>
+<span class="nf">parse</span><span class="p">(</span><span class="nv">String</span><span class="p">)</span> <span class="o">-&gt;</span> 
+    <span class="n">parse</span><span class="p">(</span><span class="nb">list_to_binary</span><span class="p">(</span><span class="nv">String</span><span class="p">)).</span>
+
+<span class="p">-</span><span class="ni">spec</span> <span class="n">parse</span><span class="p">(</span><span class="n">binary</span><span class="p">(),</span> <span class="n">list</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="nl">#input</span><span class="p">{}.</span>
+<span class="nf">parse</span><span class="p">(</span><span class="o">&lt;&lt;&gt;&gt;</span><span class="p">,</span> <span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span> 
+    <span class="nb">list_to_tuple</span><span class="p">([</span><span class="n">input</span><span class="p">|</span><span class="nv">Acc</span><span class="p">]);</span>
+<span class="nf">parse</span><span class="p">(</span><span class="o">&lt;&lt;</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="nv">Time</span><span class="p">:</span><span class="mi">16</span><span class="o">/</span><span class="n">bitstring</span><span class="p">,</span> <span class="nv">T</span><span class="o">/</span><span class="n">binary</span><span class="o">&gt;&gt;</span><span class="p">,</span> <span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="n">parse</span><span class="p">(</span><span class="nv">T</span><span class="p">,</span> <span class="nv">Acc</span> <span class="o">++</span> <span class="p">[</span><span class="nb">list_to_integer</span><span class="p">(</span><span class="nb">binary_to_list</span><span class="p">(</span><span class="nv">Time</span><span class="p">))]).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      <p>Print the ouput according to the problem brief.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">print</span><span class="p">(</span><span class="nl">#input</span><span class="p">{},</span> <span class="p">[</span><span class="n">tuple</span><span class="p">()],</span> <span class="n">number</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="n">&#39;ok&#39;</span><span class="p">.</span>
+<span class="nf">print</span><span class="p">(</span><span class="nl">#input</span><span class="p">{</span><span class="n">step</span><span class="o">=</span><span class="nv">Step</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="nv">Number</span><span class="p">},</span> <span class="nv">Durations</span><span class="p">,</span> <span class="nv">Cost</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="nv">Data</span> <span class="o">=</span> <span class="p">[</span><span class="nv">Number</span><span class="p">,</span> <span class="p">[</span><span class="nv">D</span> <span class="p">||</span> <span class="p">{_,</span> <span class="nv">D</span><span class="p">}</span> <span class="o">&lt;-</span> <span class="nv">Durations</span><span class="p">],</span> <span class="nv">Step</span><span class="p">,</span> <span class="nv">Cost</span><span class="p">],</span>
+    <span class="nn">io</span><span class="p">:</span><span class="n">fwrite</span><span class="p">(</span><span class="s">&quot;</span><span class="si">~s</span><span class="s"> </span><span class="si">~p</span><span class="s"> </span><span class="si">~c</span><span class="s"> ~-5.2f</span><span class="si">~n</span><span class="s">&quot;</span><span class="p">,</span> <span class="nv">Data</span><span class="p">).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      <p>Calculate the total calling time for each time range, passing the potentially
+modified start hour/minutes from the previous function ala function 
+composition like so:</p>
+<pre><code>evening(day(night()))
+</code></pre>
+<p>Returning a list of <code>{range, duration}</code> tuples.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">durations</span><span class="p">(</span><span class="nl">#input</span><span class="p">{})</span> <span class="o">-&gt;</span> <span class="p">[{</span><span class="n">atom</span><span class="p">(),</span> <span class="n">number</span><span class="p">()}].</span>    
+<span class="nf">durations</span><span class="p">({</span><span class="n">input</span><span class="p">,</span> <span class="p">_,</span> <span class="p">_,</span> <span class="nv">SH</span><span class="p">,</span> <span class="nv">SM</span><span class="p">,</span> <span class="nv">EH</span><span class="p">,</span> <span class="nv">EM</span><span class="p">})</span> <span class="o">-&gt;</span>
+    <span class="n">durations</span><span class="p">([</span><span class="n">night</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">evening</span><span class="p">],</span> <span class="p">{</span><span class="nv">SH</span><span class="p">,</span> <span class="nv">SM</span><span class="p">,</span> <span class="nv">EH</span><span class="p">,</span> <span class="nv">EM</span><span class="p">},</span> <span class="p">[]).</span>
+
+<span class="p">-</span><span class="ni">spec</span> <span class="n">durations</span><span class="p">([</span><span class="n">atom</span><span class="p">()],</span> <span class="n">tuple</span><span class="p">(),</span> <span class="p">[{</span><span class="n">atom</span><span class="p">(),</span> <span class="n">number</span><span class="p">()}])</span> <span class="o">-&gt;</span> <span class="p">[{</span><span class="n">atom</span><span class="p">(),</span> <span class="n">number</span><span class="p">()}].</span>
+<span class="nf">durations</span><span class="p">([],</span> <span class="p">_,</span> <span class="nv">Acc</span><span class="p">)</span>        <span class="o">-&gt;</span> <span class="nv">Acc</span><span class="p">;</span>
+<span class="nf">durations</span><span class="p">([</span><span class="nv">H</span><span class="p">|</span><span class="nv">T</span><span class="p">],</span> <span class="nv">Times</span><span class="p">,</span> <span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span> 
+    <span class="p">{</span><span class="nv">Duration</span><span class="p">,</span> <span class="nv">ModTimes</span><span class="p">}</span> <span class="o">=</span> <span class="n">calculate</span><span class="p">(</span><span class="nv">H</span><span class="p">,</span> <span class="nv">Times</span><span class="p">),</span>
+    <span class="n">durations</span><span class="p">(</span><span class="nv">T</span><span class="p">,</span> <span class="nv">ModTimes</span><span class="p">,</span> <span class="p">[{</span><span class="nv">H</span><span class="p">,</span> <span class="nv">Duration</span><span class="p">}|</span><span class="nv">Acc</span><span class="p">]).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-14'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-14'>#</a>
+      </div>
+      <p>Calculate the duration of the call in the a time range, returning the 
+duration and a potentially updated set of start hour/minutes.</p>
+<p>The time ranges are calculated as follows:</p>
+<pre><code>Day: 8:00 - 17:59
+Evening: 18:00 - 21:59
+Night: 22:00 - 7:59
+</code></pre>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">calculate</span><span class="p">(</span><span class="n">atom</span><span class="p">(),</span> <span class="n">tuple</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="n">number</span><span class="p">(),</span> <span class="n">tuple</span><span class="p">()}.</span>    
+<span class="nf">calculate</span><span class="p">(</span><span class="n">night</span><span class="p">,</span> <span class="p">{</span><span class="nv">SH</span><span class="p">,</span> <span class="nv">SM</span><span class="p">,</span> <span class="nv">EH</span><span class="p">,</span> <span class="nv">EM</span><span class="p">})</span> <span class="k">when</span> <span class="nv">SH</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">,</span> <span class="nv">EH</span> <span class="o">&gt;=</span> <span class="mi">8</span> <span class="o">-&gt;</span>
+    <span class="p">{(</span><span class="nv">SH</span> <span class="o">-</span> <span class="mi">8</span><span class="p">)</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">-</span> <span class="nv">SM</span><span class="p">,</span> <span class="p">{</span><span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">EH</span><span class="p">,</span> <span class="nv">EM</span><span class="p">}};</span>
+<span class="nf">calculate</span><span class="p">(</span><span class="n">night</span><span class="p">,</span> <span class="p">{</span><span class="nv">SH</span><span class="p">,</span> <span class="nv">SM</span><span class="p">,</span> <span class="nv">EH</span><span class="p">,</span> <span class="nv">EM</span><span class="p">}</span><span class="o">=</span><span class="nv">Times</span><span class="p">)</span> <span class="k">when</span> <span class="nv">SH</span> <span class="o">&lt;</span> <span class="mi">8</span> <span class="o">-&gt;</span>
+    <span class="p">{(</span><span class="nv">EH</span> <span class="o">-</span> <span class="nv">SH</span><span class="p">)</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="nv">EM</span> <span class="o">-</span> <span class="nv">SM</span><span class="p">,</span> <span class="nv">Times</span><span class="p">};</span>
+<span class="nf">calculate</span><span class="p">(</span><span class="n">day</span><span class="p">,</span> <span class="p">{</span><span class="nv">SH</span><span class="p">,</span> <span class="nv">SM</span><span class="p">,</span> <span class="nv">EH</span><span class="p">,</span> <span class="nv">EM</span><span class="p">})</span> <span class="k">when</span> <span class="nv">EH</span> <span class="o">&gt;=</span> <span class="mi">18</span><span class="p">,</span> <span class="nv">SH</span> <span class="o">&lt;</span> <span class="mi">18</span> <span class="o">-&gt;</span>
+    <span class="p">{(</span><span class="mi">18</span> <span class="o">-</span> <span class="nv">SH</span><span class="p">)</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">-</span> <span class="nv">SM</span><span class="p">,</span> <span class="p">{</span><span class="mi">18</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">EH</span><span class="p">,</span> <span class="nv">EM</span><span class="p">}};</span>
+<span class="nf">calculate</span><span class="p">(</span><span class="n">day</span><span class="p">,</span> <span class="p">{</span><span class="nv">SH</span><span class="p">,</span> <span class="nv">SM</span><span class="p">,</span> <span class="nv">EH</span><span class="p">,</span> <span class="nv">EM</span><span class="p">}</span><span class="o">=</span><span class="nv">Times</span><span class="p">)</span> <span class="k">when</span> <span class="nv">EH</span> <span class="o">&gt;=</span> <span class="mi">8</span><span class="p">,</span> <span class="nv">SH</span> <span class="o">&lt;</span> <span class="mi">18</span> <span class="o">-&gt;</span>
+    <span class="p">{(</span><span class="nv">EH</span> <span class="o">-</span> <span class="nv">SH</span><span class="p">)</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="nv">EM</span> <span class="o">-</span> <span class="nv">SM</span><span class="p">,</span> <span class="nv">Times</span><span class="p">};</span>
+<span class="nf">calculate</span><span class="p">(</span><span class="n">evening</span><span class="p">,</span> <span class="p">{</span><span class="nv">SH</span><span class="p">,</span> <span class="nv">SM</span><span class="p">,</span> <span class="nv">EH</span><span class="p">,</span> <span class="nv">EM</span><span class="p">})</span> <span class="k">when</span> <span class="nv">EH</span> <span class="o">&gt;=</span> <span class="mi">22</span><span class="p">,</span> <span class="nv">SH</span> <span class="o">&lt;</span> <span class="mi">22</span> <span class="o">-&gt;</span>
+    <span class="p">{(</span><span class="mi">22</span> <span class="o">-</span> <span class="nv">SH</span><span class="p">)</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">-</span> <span class="nv">SM</span><span class="p">,</span> <span class="p">{</span><span class="mi">22</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">EH</span><span class="p">,</span> <span class="nv">EM</span><span class="p">}};</span>
+<span class="nf">calculate</span><span class="p">(</span><span class="n">evening</span><span class="p">,</span> <span class="p">{</span><span class="nv">SH</span><span class="p">,</span> <span class="nv">SM</span><span class="p">,</span> <span class="nv">EH</span><span class="p">,</span> <span class="nv">EM</span><span class="p">}</span><span class="o">=</span><span class="nv">Times</span><span class="p">)</span> <span class="k">when</span> <span class="nv">EH</span> <span class="o">&gt;=</span> <span class="mi">18</span><span class="p">,</span> <span class="nv">SH</span> <span class="o">&lt;</span> <span class="mi">22</span> <span class="o">-&gt;</span>
+    <span class="p">{(</span><span class="nv">EH</span> <span class="o">-</span> <span class="nv">SH</span><span class="p">)</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="nv">EM</span> <span class="o">-</span> <span class="nv">SM</span><span class="p">,</span> <span class="nv">Times</span><span class="p">};</span>
+<span class="nf">calculate</span><span class="p">(_,</span> <span class="nv">Times</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="nv">Times</span><span class="p">}.</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-15'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-15'>#</a>
+      </div>
+      <p>Calculate the cost for a specific step given a list of <code>{range, duration}</code> tuples.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">cost</span><span class="p">(</span><span class="n">char</span><span class="p">(),</span> <span class="p">[{</span><span class="n">atom</span><span class="p">(),</span> <span class="n">number</span><span class="p">()}])</span> <span class="o">-&gt;</span> <span class="n">number</span><span class="p">().</span>
+<span class="nf">cost</span><span class="p">(</span><span class="nv">Step</span><span class="p">,</span> <span class="nv">Durations</span><span class="p">)</span>                    <span class="o">-&gt;</span> <span class="n">cost</span><span class="p">(</span><span class="nv">Step</span><span class="p">,</span> <span class="nv">Durations</span><span class="p">,</span> <span class="mi">0</span><span class="p">).</span>    
+
+<span class="p">-</span><span class="ni">spec</span> <span class="n">cost</span><span class="p">(</span><span class="n">char</span><span class="p">(),</span> <span class="p">[{</span><span class="n">atom</span><span class="p">(),</span><span class="n">number</span><span class="p">()}],</span> <span class="n">number</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="n">number</span><span class="p">().</span>
+<span class="nf">cost</span><span class="p">(_,</span> <span class="p">[],</span> <span class="nv">Total</span><span class="p">)</span>                       <span class="o">-&gt;</span> <span class="nv">Total</span><span class="p">;</span>
+<span class="nf">cost</span><span class="p">(</span><span class="nv">Step</span><span class="p">,</span> <span class="p">[{</span><span class="nv">Range</span><span class="p">,</span> <span class="nv">Duration</span><span class="p">}|</span><span class="nv">T</span><span class="p">],</span> <span class="nv">Total</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cost</span><span class="p">(</span><span class="nv">Step</span><span class="p">,</span> <span class="nv">T</span><span class="p">,</span> <span class="nv">Duration</span> <span class="o">*</span> <span class="n">rate</span><span class="p">(</span><span class="nv">Step</span><span class="p">,</span> <span class="nv">Range</span><span class="p">)</span> <span class="o">+</span> <span class="nv">Total</span><span class="p">).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-16'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-16'>#</a>
+      </div>
+      <p>Get the calling rate keyed by charging step for each of respective time ranges.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">rate</span><span class="p">(</span><span class="n">char</span><span class="p">(),</span> <span class="n">day</span> <span class="p">|</span> <span class="n">evening</span> <span class="p">|</span> <span class="n">night</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">().</span>
+<span class="nf">rate</span><span class="p">(</span><span class="nv">Step</span><span class="p">,</span> <span class="nv">Range</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nn">lists</span><span class="p">:</span><span class="n">nth</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="sc">$A</span> <span class="o">-</span> <span class="nv">Step</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">rates</span><span class="p">(</span><span class="nv">Range</span><span class="p">)).</span>
+
+<span class="p">-</span><span class="ni">spec</span> <span class="n">rates</span><span class="p">(</span><span class="n">day</span> <span class="p">|</span> <span class="n">evening</span> <span class="p">|</span> <span class="n">night</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="nb">float</span><span class="p">()].</span>    
+<span class="nf">rates</span><span class="p">(</span><span class="n">day</span><span class="p">)</span>     <span class="o">-&gt;</span> <span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">25</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">53</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">87</span><span class="p">,</span> <span class="mi">1</span><span class="p">.</span><span class="mi">44</span><span class="p">];</span>
+<span class="nf">rates</span><span class="p">(</span><span class="n">evening</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">06</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">15</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">33</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">47</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">80</span><span class="p">];</span>
+<span class="nf">rates</span><span class="p">(</span><span class="n">night</span><span class="p">)</span>   <span class="o">-&gt;</span> <span class="p">[</span><span class="mi">0</span><span class="p">.</span><span class="mi">02</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">05</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">13</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">17</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">30</span><span class="p">].</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

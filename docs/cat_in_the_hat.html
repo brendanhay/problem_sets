@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>cat_in_the_hat.erl</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id="background"></div>
+<div id='container'>
+  
+  <div class='section'>
+    <div class='docs'><h1>cat_in_the_hat.erl</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      <p>A semi-literate-programming Python solution for the <strong>Cat in the Hat</strong>
+problem from <a href="http://www.streamtech.nl/problemset/107.html">streamtech's</a> 
+problem set by <a href="http://www.github.com/brendanhay">Brendan Hay</a>. </p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div> 
+      <h3>Brief</h3>
+<h4>Background</h4>
+<p>(An homage to Theodore Seuss Geisel)
+The Cat in the Hat is a nasty creature,
+But the striped hat he is wearing has a rather nifty feature.
+With one flick of his wrist he pops his top off.
+Do you know what's inside that Cat's hat?
+A bunch of small cats, each with its own striped hat.
+Each little cat does the same as line three,
+All except the littlest ones, who just say "Why me?"
+Because the littlest cats have to clean all the grime,
+And they're tired of doing it time after time!</p>
+<h4>Problem</h4>
+<p>A clever cat walks into a messy room which he needs to clean. Instead of doing 
+the work alone, it decides to have its helper cats do the work. It keeps its 
+(smaller) helper cats inside its hat. Each helper cat also has helper cats in 
+its own hat, and so on. Eventually, the cats reach a smallest size. These smallest 
+cats have no additional cats in their hats. These unfortunate smallest cats have
+to do the cleaning. The number of cats inside each (non-smallest) cat's hat 
+is a constant, N. The height of these cats-in-a-hat is <code>1/N+1</code> times the height 
+of the cat whose hat they are in. The smallest cats are of height one; 
+these are the cats that get the work done. All heights are positive integers.
+Given the height of the initial cat and the number of worker cats (of height one), 
+find the number of cats that are not doing any work (cats of height greater than one) 
+and also determine the sum of all the cats' heights (the height of a stack of all 
+cats standing one on top of another).</p>
+<h4>Input</h4>
+<p>The input consists of a sequence of cat-in-hat specifications. Each specification 
+is a single line consisting of two positive integers, separated by white space. 
+The first integer is the height of the initial cat, and the second integer is 
+the number of worker cats. A pair of 0's on a line indicates the end of input.</p>
+<pre><code>216 125
+5764801 1679616
+0 0
+</code></pre>
+<h4>Output</h4>
+<p>For each input line (cat-in-hat specification), print the number of cats that are 
+not working, followed by a space, followed by the height of the stack of cats. 
+There should be one output line for each input line other than the <code>0 0</code>
+that terminates input.</p>
+<pre><code>31 671
+335923 30275911
+</code></pre>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <h3>Running</h3>
+<p>Erlang is required, sources and binaries for various environments 
+can be downloaded from <a href="http://erlang.org/download.html">the official site</a>.</p>
+<p>Assuming your prompt is in the same location as the problem file <code>cat_in_the_hat.erl</code>, 
+and the input file <code>cat_in_the_hat.txt</code>, you can compile it:</p>
+<pre><code>$ erl
+1&gt; c(cat_in_the_hat).
+</code></pre>
+<p>You should see the following, indicating successful compilation:</p>
+<pre><code>{ok,cat_in_the_hat}
+</code></pre>
+<p>The problem can then be run:</p>
+<pre><code>2&gt; cat_in_the_hat:start().
+</code></pre>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <h3>Module Definition</h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p><code>start/0</code> is exported as the top-level entry point.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">module</span><span class="p">(</span><span class="n">cat_in_the_hat</span><span class="p">).</span>
+<span class="p">-</span><span class="ni">export</span><span class="p">([</span><span class="n">start</span><span class="o">/</span><span class="mi">0</span><span class="p">]).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <p>Open the file and pass the <code>IO</code> device to <code>read/1</code> applying the subsequent steps to the
+previous results until <code>print/1</code> is reached.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nf">start</span><span class="p">()</span> <span class="o">-&gt;</span>
+    <span class="p">{</span><span class="n">ok</span><span class="p">,</span> <span class="nv">IO</span><span class="p">}</span> <span class="o">=</span> <span class="nn">file</span><span class="p">:</span><span class="n">open</span><span class="p">(</span><span class="s">&quot;cat_in_the_hat.txt&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">read</span><span class="p">]),</span>
+    <span class="n">print</span><span class="p">(</span><span class="n">total</span><span class="p">(</span><span class="n">count</span><span class="p">(</span><span class="n">read</span><span class="p">(</span><span class="nv">IO</span><span class="p">)))).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <p>Print the resulting list of unemployed cats and total height of the stack of cats
+according to the problem brief. </p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nf">print</span><span class="p">([])</span> <span class="o">-&gt;</span> <span class="n">ok</span><span class="p">;</span>
+<span class="nf">print</span><span class="p">([{</span><span class="nv">Unemployed</span><span class="p">,</span> <span class="nv">Height</span><span class="p">}|</span><span class="nv">T</span><span class="p">])</span> <span class="o">-&gt;</span>
+    <span class="nn">io</span><span class="p">:</span><span class="n">fwrite</span><span class="p">(</span><span class="s">&quot;</span><span class="si">~p</span><span class="s"> </span><span class="si">~p</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="nn">lists</span><span class="p">:</span><span class="n">map</span><span class="p">(</span><span class="k">fun</span> <span class="nb">trunc</span><span class="o">/</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="nv">Unemployed</span><span class="p">,</span> <span class="nv">Height</span><span class="p">])),</span>
+    <span class="n">print</span><span class="p">(</span><span class="nv">T</span><span class="p">).</span>    </pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>Sugar for <code>read/2</code> to specify a default accumulator.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nf">read</span><span class="p">(</span><span class="nv">IO</span><span class="p">)</span>      <span class="o">-&gt;</span> <span class="n">read</span><span class="p">(</span><span class="nv">IO</span><span class="p">,</span> <span class="p">[]).</span>  
+ </pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <p>Read a two digits on a line from <code>IO</code> device and parse the result using <code>parse/2</code>,
+which in turn calls this to request another line, accumulating the parsed results
+and returning from <code>parse/2</code> when <code>eof</code> or the problem brief's <code>0 0</code> stop is reached.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nf">read</span><span class="p">(</span><span class="nv">IO</span><span class="p">,</span> <span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">parse</span><span class="p">(</span><span class="nv">IO</span><span class="p">,</span> <span class="nn">io</span><span class="p">:</span><span class="n">fread</span><span class="p">(</span><span class="nv">IO</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">~d</span><span class="s"> </span><span class="si">~d</span><span class="s">&quot;</span><span class="p">),</span> <span class="nv">Acc</span><span class="p">).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p>Pattern match and accumulate the two expected digits from a formatted line from
+<code>IO</code> device.</p>
+<p>No need to reverse the accumulator on return as <code>count/1</code> and <code>count/2</code> don't reverse either
+and prepend to their accumulators.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nf">parse</span><span class="p">(_,</span> <span class="n">eof</span><span class="p">,</span> <span class="nv">Acc</span><span class="p">)</span>                      <span class="o">-&gt;</span> <span class="nv">Acc</span><span class="p">;</span>
+<span class="nf">parse</span><span class="p">(_,</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]},</span> <span class="nv">Acc</span><span class="p">)</span>             <span class="o">-&gt;</span> <span class="nv">Acc</span><span class="p">;</span>
+<span class="nf">parse</span><span class="p">(</span><span class="nv">IO</span><span class="p">,</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span> <span class="p">[</span><span class="nv">Height</span><span class="p">,</span> <span class="nv">Workers</span><span class="p">]},</span> <span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">read</span><span class="p">(</span><span class="nv">IO</span><span class="p">,</span> <span class="p">[{</span><span class="nv">Height</span><span class="p">,</span> <span class="nv">Workers</span><span class="p">}|</span><span class="nv">Acc</span><span class="p">]);</span>
+<span class="nf">parse</span><span class="p">(</span><span class="nv">IO</span><span class="p">,</span> <span class="p">_,</span> <span class="nv">Acc</span><span class="p">)</span>                       <span class="o">-&gt;</span> <span class="n">read</span><span class="p">(</span><span class="nv">IO</span><span class="p">,</span> <span class="nv">Acc</span><span class="p">).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p>Sugar for <code>count/2</code> to specify a default accumulator.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nf">count</span><span class="p">(</span><span class="nv">Cats</span><span class="p">)</span>                       <span class="o">-&gt;</span> <span class="n">count</span><span class="p">(</span><span class="nv">Cats</span><span class="p">,</span> <span class="p">[]).</span>  </pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <p>Accumulate the measurements for a list of parsed inputs.<br />
+</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nf">count</span><span class="p">([],</span> <span class="nv">Acc</span><span class="p">)</span>                    <span class="o">-&gt;</span> <span class="nv">Acc</span><span class="p">;</span>
+<span class="nf">count</span><span class="p">([{</span><span class="nv">Height</span><span class="p">,</span> <span class="nv">Workers</span><span class="p">}|</span><span class="nv">T</span><span class="p">],</span> <span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">count</span><span class="p">(</span><span class="nv">T</span><span class="p">,</span> <span class="p">[</span><span class="n">measure</span><span class="p">(</span><span class="nv">Height</span><span class="p">,</span> <span class="nv">Workers</span><span class="p">)|</span><span class="nv">Acc</span><span class="p">]).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      <p>Handle <code>Height: 1, Workers: 1</code> seperately as <code>measure/3</code> doesn't work for this case.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nf">measure</span><span class="p">(</span><span class="nv">Height</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>       <span class="o">-&gt;</span> <span class="nv">K</span> <span class="o">=</span> <span class="nn">math</span><span class="p">:</span><span class="n">log</span><span class="p">(</span><span class="nv">Height</span><span class="p">)</span> <span class="o">/</span> <span class="nn">math</span><span class="p">:</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="p">{</span><span class="nv">Height</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">K</span><span class="p">,</span> <span class="nv">K</span><span class="p">};</span>
+<span class="nf">measure</span><span class="p">(</span><span class="nv">Height</span><span class="p">,</span> <span class="nv">Workers</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">measure</span><span class="p">(</span><span class="nv">Height</span><span class="p">,</span> <span class="nv">Workers</span><span class="p">,</span> <span class="mi">2</span><span class="p">).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      <p>Measure the number of cat's inside any cat with a height greater than 1's hat, and
+the number of workers.</p>
+<p><code>K</code> is the number of cats inside each (non-smallest) cat's hat.
+<code>T</code> is the number of cats with different heights.</p>
+<p>Since I'm dealing with floats, I can't use <code>lists:seq</code> and other range operators, 
+hence the use of index <code>N</code>. </p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nf">measure</span><span class="p">(</span><span class="nv">Height</span><span class="p">,</span> <span class="nv">Workers</span><span class="p">,</span> <span class="nv">N</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="nv">K</span> <span class="o">=</span> <span class="nn">math</span><span class="p">:</span><span class="n">log</span><span class="p">(</span><span class="nv">Workers</span><span class="p">)</span> <span class="o">/</span> <span class="nn">math</span><span class="p">:</span><span class="n">log</span><span class="p">(</span><span class="nv">N</span><span class="p">),</span>
+    <span class="nv">T</span> <span class="o">=</span> <span class="nn">math</span><span class="p">:</span><span class="n">pow</span><span class="p">(</span><span class="nv">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">K</span><span class="p">)</span> <span class="o">-</span> <span class="nv">Height</span><span class="p">,</span>
+    <span class="k">if</span> 
+	<span class="nv">T</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">.</span><span class="mi">0000001</span> <span class="o">-&gt;</span>
+	    <span class="p">{</span><span class="nv">Height</span><span class="p">,</span> <span class="nv">N</span><span class="p">,</span> <span class="nv">K</span><span class="p">,</span> <span class="p">(</span><span class="nn">math</span><span class="p">:</span><span class="n">pow</span><span class="p">(</span><span class="nv">N</span><span class="p">,</span> <span class="nv">K</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nv">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)};</span>
+	<span class="n">true</span> <span class="o">-&gt;</span>
+	    <span class="n">measure</span><span class="p">(</span><span class="nv">Height</span><span class="p">,</span> <span class="nv">Workers</span><span class="p">,</span> <span class="nv">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">end</span><span class="p">.</span>  </pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-14'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-14'>#</a>
+      </div>
+      <p>Sugar for <code>count/2</code> to specify a default accumulator.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nf">total</span><span class="p">(</span><span class="nv">Measurements</span><span class="p">)</span> <span class="o">-&gt;</span> 
+    <span class="n">total</span><span class="p">(</span><span class="nv">Measurements</span><span class="p">,</span> <span class="p">[]).</span>   </pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-15'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-15'>#</a>
+      </div>
+      <p>Accumulate the sums of a list of counted/measured inputs, 
+<code>Unemployed</code> is the total number of cat's not working and 
+<code>N / (N + 1)</code> is the height of a cat in a hat which is used as the initial increment
+to determine the total height of a stack of cats using <code>sum/5</code>.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nf">total</span><span class="p">([],</span> <span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span> 
+    <span class="nn">lists</span><span class="p">:</span><span class="n">reverse</span><span class="p">(</span><span class="nv">Acc</span><span class="p">);</span>
+<span class="nf">total</span><span class="p">([{</span><span class="nv">Height</span><span class="p">,</span> <span class="nv">N</span><span class="p">,</span> <span class="nv">K</span><span class="p">,</span> <span class="nv">Unemployed</span><span class="p">}|</span><span class="nv">T</span><span class="p">],</span> <span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="n">total</span><span class="p">(</span><span class="nv">T</span><span class="p">,</span> <span class="p">[{</span><span class="nv">Unemployed</span><span class="p">,</span> <span class="n">sum</span><span class="p">(</span><span class="nv">N</span> <span class="o">/</span> <span class="p">(</span><span class="nv">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="nv">Height</span><span class="p">,</span> <span class="nv">Height</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">K</span> <span class="o">+</span> <span class="mi">0</span><span class="p">.</span><span class="mi">1</span><span class="p">)}|</span><span class="nv">Acc</span><span class="p">]).</span>   </pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-16'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-16'>#</a>
+      </div>
+      <p>Sum the total height of the stack of cats where <code>Max</code> is the number of cats
+inside all non-working cat's hats.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nf">sum</span><span class="p">(</span><span class="nv">Step</span><span class="p">,</span> <span class="nv">Height</span><span class="p">,</span> <span class="nv">Total</span><span class="p">,</span> <span class="nv">N</span><span class="p">,</span> <span class="nv">Max</span><span class="p">)</span> <span class="k">when</span> <span class="nv">N</span> <span class="o">=&lt;</span> <span class="nv">Max</span>  <span class="o">-&gt;</span>
+    <span class="n">sum</span><span class="p">(</span><span class="nv">Step</span><span class="p">,</span> <span class="nv">Step</span> <span class="o">*</span> <span class="nv">Height</span><span class="p">,</span> <span class="nv">Step</span> <span class="o">*</span> <span class="nv">Height</span> <span class="o">+</span> <span class="nv">Total</span><span class="p">,</span>  <span class="nv">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">Max</span><span class="p">);</span>
+<span class="nf">sum</span><span class="p">(_,</span> <span class="p">_,</span> <span class="nv">Total</span><span class="p">,</span> <span class="p">_,</span> <span class="p">_)</span> <span class="o">-&gt;</span>
+    <span class="nv">Total</span><span class="p">.</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

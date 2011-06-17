@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>ecological_bin_packing.py</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id="background"></div>
+<div id='container'>
+  
+  <div class='section'>
+    <div class='docs'><h1>ecological_bin_packing.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      <p>A semi-literate-programming Python solution for the <strong>Ecological Bin Packing</strong>
+problem from <a href="http://#www.streamtech.nl/problemset/102.html">streamtech's</a> 
+problem set by <a href="http://#www.github.com/brendanhay">Brendan Hay</a>. </p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <h3>Brief</h3>
+<h4>Background</h4>
+<p>Bin packing, or the placement of objects of certain weights into different bins
+subject to certain constraints, is an historically interesting problem.
+Some bin packing problems are NP-complete but are amenable to dynamic programming
+solutions or to approximately optimal heuristic solutions.
+In this problem you will be solving a bin packing problem that deals with recycling glass.</p>
+<h4>Problem</h4>
+<p>Recycling glass requires that the glass be separated by color into one of three
+categories: brown glass, green glass, and clear glass. In this problem you will be
+given three recycling bins, each containing a specified number of brown, green and
+clear bottles. In order to be recycled, the bottles will need to be moved so that
+each bin contains bottles of only one color.
+The problem is to minimize the number of bottles that are moved. You may assume that
+the only problem is to minimize the number of movements between boxes.
+For the purposes of this problem, each bin has infinite capacity and the only
+constraint is moving the bottles so that each bin contains bottles of a single color.
+The total number of bottles will never exceed 2^31.</p>
+<h4>Input</h4>
+<p>The input consists of a series of lines with each line containing 9 integers.
+The first three integers on a line represent the number of brown, green, and clear bottles
+(respectively) in bin number 1, the second three represent the number of brown,
+green and clear bottles (respectively) in bin number 2, and the last three integers
+represent the number of brown, green, and clear bottles (respectively) in bin number 3.
+For example, the line 10 15 20 30 12 8 15 8 31 indicates that there are 20 clear
+bottles in bin 1, 12 green bottles in bin 2, and 15 brown bottles in bin 3.
+Integers on a line will be separated by one or more spaces.
+Your program should process all lines in the input file.</p>
+<pre><code>1 2 3 4 5 6 7 8 9
+5 10 5 20 10 5 10 20 10
+</code></pre>
+<h4>Output</h4>
+<p>For each line of input there will be one line of output indicating what color
+bottles go in what bin to minimize the number of bottle movements. You should
+also print the minimum number of bottle movements.
+The output should consist of a string of the three upper case characters 'G', 'B', 'C'
+(representing the colors green, brown, and clear) representing the color associated with each bin.
+The first character of the string represents the color associated with the first bin,
+the second character of the string represents the color associated with the
+second bin, and the third character represents the color associated with the third bin.
+The integer indicating the minimum number of bottle movements should follow the string.
+If more than one order of brown, green, and clear bins yields the minimum number of
+movements then the alphabetically first string representing a minimal configuration should be printed.</p>
+<pre><code>BCG 30
+CBG 50
+</code></pre>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <h3>Running</h3>
+<p>Python is required, and can be downloaded from
+<a href="http://python.org/download/">the official site</a>.</p>
+<p>Assuming your prompt is in the same location as the problem file and
+the data file <code>ecological_bin_packing.txt</code></p>
+<pre><code>$ python ecological_bin_packing.py
+</code></pre>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <p>Parse an input line from <code>file_name</code> into a list of integers.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">count</span><span class="p">)</span> <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p>Count the number of possible movements for the combination of <code>a, b, c</code> of which
+each represent a different bottle color group in a seperate bin.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">count_moves</span><span class="p">(</span><span class="n">bottles</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <p>Inner function used as sugar so the list of bottles only
+needs to be passed in once to the parent.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">moves</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">([</span><span class="n">bottles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bottles</span><span class="p">))</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">]])</span>
+    
+    <span class="k">return</span> <span class="n">moves</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <p>Find the lowest number of movements and the best possible combination
+by brute forcing over possible bottle color permutations.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">best_combination</span><span class="p">(</span><span class="n">bottles</span><span class="p">):</span>
+    <span class="n">moves</span> <span class="o">=</span> <span class="n">count_moves</span><span class="p">(</span><span class="n">bottles</span><span class="p">)</span>
+
+    <span class="n">movements</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;BCG&#39;</span><span class="p">:</span> <span class="n">moves</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> 
+        <span class="s">&#39;BGC&#39;</span><span class="p">:</span> <span class="n">moves</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> 
+        <span class="s">&#39;CBG&#39;</span><span class="p">:</span> <span class="n">moves</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
+        <span class="s">&#39;CGB&#39;</span><span class="p">:</span> <span class="n">moves</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="s">&#39;GBC&#39;</span><span class="p">:</span> <span class="n">moves</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+        <span class="s">&#39;GCB&#39;</span><span class="p">:</span> <span class="n">moves</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="p">}</span>
+
+    <span class="n">combo</span><span class="p">,</span> <span class="n">minimum</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">31</span>
+        
+    <span class="k">for</span> <span class="n">combination</span><span class="p">,</span> <span class="n">moves</span> <span class="ow">in</span> <span class="n">movements</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">moves</span> <span class="o">&lt;</span> <span class="n">minimum</span><span class="p">:</span>
+            <span class="n">combo</span><span class="p">,</span> <span class="n">minimum</span> <span class="o">=</span> <span class="n">combination</span><span class="p">,</span> <span class="n">moves</span>
+ 
+    <span class="k">return</span> <span class="n">combo</span><span class="p">,</span> <span class="n">min_moves</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>Open and parse the <code>ecological_bin_packing.txt</code> file, printing the resulting
+best combination of bottle colors and the number of movements required according
+to the problem brief output.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">bottles</span> <span class="ow">in</span> <span class="n">parse</span><span class="p">(</span><span class="s">&quot;ecological_bin_packing.txt&quot;</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">best_combination</span><span class="p">(</span><span class="n">bottles</span><span class="p">)</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

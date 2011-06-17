@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>flapjacks.erl</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id="background"></div>
+<div id='container'>
+  
+  <div class='section'>
+    <div class='docs'><h1>flapjacks.erl</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      <p>A semi-literate-programming Erlang solution for the <strong>Stacks of Flapjacks</strong><br />
+</p>
+<p>problem from <a href="http://www.streamtech.nl/problemset/120.html">streamtech's</a> 
+problem set by <a href="http://www.github.com/brendanhay">Brendan Hay</a>.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <h3>Brief</h3>
+<h4>Background</h4>
+<p>Stacks and Queues are often considered the bread and butter of data structures 
+and find use in architecture, parsing, operating systems, and discrete event simulation. 
+Stacks are also important in the theory of formal languages.
+This problem involves both butter and sustenance in the form of pancakes 
+rather than bread in addition to a finicky server who flips pancakes 
+according to a unique, but complete set of rules.</p>
+<h4>Problem</h4>
+<p>Given a stack of pancakes, you are to write a program that indicates how the stack can 
+be sorted so that the largest pancake is on the bottom and the smallest pancake is on the top.
+The size of a pancake is given by the pancake's diameter. 
+All pancakes in a stack have different diameters.
+Sorting a stack is done by a sequence of pancake flips. 
+A <code>flip</code> consists of inserting a spatula between two pancakes in a stack and flipping 
+(reversing) the pancakes on the spatula (reversing the sub-stack).
+ A flip is specified by giving the position of the pancake on the bottom of the 
+sub-stack to be flipped (relative to the whole stack). The pancake on the bottom
+ of the whole stack has position 1 and the pancake on the top of 
+a stack of n pancakes has position n.
+A stack is specified by giving the diameter of each pancake 
+in the stack in the order in which the pancakes appear.</p>
+<h4>Input</h4>
+<p>The input consists of a sequence of stacks of pancakes. Each stack will consist of between 
+1 and 30 pancakes and each pancake will have an integer diameter between 1 and 100. 
+The input is terminated by end-of-file. Each stack is given as a single line of input 
+with the top pancake on a stack appearing first on a line, the bottom pancake appearing 
+last, and all pancakes separated by a space.</p>
+<pre><code>1 2 3 4 5
+5 4 3 2 1
+5 1 2 3 4
+</code></pre>
+<h4>Output</h4>
+<p>For each stack of pancakes, the output should echo the original stack on one line, 
+followed by some sequence of flips that results in the stack of pancakes being 
+sorted so that the largest diameter pancake is on the bottom and the smallest on top. 
+For each stack the sequence of flips should be terminated by a 0 
+(indicating no more flips necessary). Once a stack is sorted, no more flips should be made.</p>
+<pre><code>1 2 3 4 5
+0
+5 4 3 2 1
+1 0
+5 1 2 3 4
+1 2 0
+</code></pre>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <h3>Running</h3>
+<p>Erlang is required, sources and binaries for various environments 
+can be downloaded from <a href="http://erlang.org/download.html">the official site</a>.</p>
+<p>Assuming your prompt is in the same location as 
+the problem file <code>flapjacks.erl</code>, you can compile it:</p>
+<pre><code>$ erl
+1&gt; c(flapjacks).
+</code></pre>
+<p>You should see the following, indicating successful compilation:</p>
+<pre><code>{ok,flapjacks}
+</code></pre>
+<p>The problem can then be run:</p>
+<pre><code>2&gt; flapjacks:start().
+</code></pre>
+<p>And finally, it will prompt for an input string according to the problem brief (ie. <code>5 1 2 3 4</code>):</p>
+<pre><code>Pankcakes!:
+</code></pre>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <h3>Module Definition</h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p><code>sort/1</code> is exported for debugging but be warned it doesn't perform any sort 
+of input sanitisation. <code>start/0</code> is exported as the top-level entry point.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">module</span><span class="p">(</span><span class="n">flapjacks</span><span class="p">).</span>
+<span class="p">-</span><span class="ni">export</span><span class="p">([</span><span class="n">sort</span><span class="o">/</span><span class="mi">1</span><span class="p">,</span> <span class="n">start</span><span class="o">/</span><span class="mi">0</span><span class="p">]).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <h3>Exported Functions</h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <p>Start the pancake flipper by reading numeric space delimited input from 
+the term: <code>5 1 2 3 4</code></p>
+<p>The first two lines of output are according to the brief,
+with the following two lines describing the final state
+of the stack and specific positions that were flipped.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">start</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">&#39;ok&#39;</span><span class="p">.</span>
+<span class="nf">start</span><span class="p">()</span> <span class="o">-&gt;</span>
+    <span class="nv">Stack</span> <span class="o">=</span> <span class="n">read</span><span class="p">(),</span>
+    <span class="p">{</span><span class="nv">Sorted</span><span class="p">,</span> <span class="nv">Ops</span><span class="p">}</span> <span class="o">=</span> <span class="n">sort</span><span class="p">(</span><span class="nv">Stack</span><span class="p">),</span>
+    <span class="n">print</span><span class="p">(</span><span class="nv">Stack</span><span class="p">,</span> <span class="s">&quot;Input&quot;</span><span class="p">),</span>
+    <span class="n">print</span><span class="p">(</span><span class="n">count</span><span class="p">(</span><span class="nv">Ops</span><span class="p">),</span> <span class="s">&quot;Output&quot;</span><span class="p">),</span>
+    <span class="n">print</span><span class="p">(</span><span class="nv">Sorted</span><span class="p">,</span> <span class="s">&quot;Sorted&quot;</span><span class="p">),</span>
+    <span class="n">print</span><span class="p">(</span><span class="nv">Ops</span><span class="p">,</span> <span class="s">&quot;Operations&quot;</span><span class="p">).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>Sorts the stack of pancakes using only the <code>flip</code> algorithm described in the
+problem brief. Calls <code>sort/2</code> with the <code>stack</code> and the expected outcome which
+is achieved via the <code>O(n log n)</code> merge-sort in <code>lists:sort/1</code>. It returns 
+a <code>tuple</code> consisting of the sorted result and the positions of the pancakes 
+that were flipped, which needs to be reversed to be in the correct order
+as the operations are recorded via prepending to the head.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">sort</span><span class="p">([</span><span class="n">integer</span><span class="p">()])</span> <span class="o">-&gt;</span> <span class="p">{[</span><span class="n">integer</span><span class="p">()],</span> <span class="p">[</span><span class="n">integer</span><span class="p">()]}.</span>
+<span class="nf">sort</span><span class="p">([])</span>    <span class="o">-&gt;</span> <span class="p">{[],</span> <span class="p">[]};</span>
+<span class="nf">sort</span><span class="p">(</span><span class="nv">Stack</span><span class="p">)</span> <span class="o">-&gt;</span> 
+    <span class="p">{</span><span class="nv">Sorted</span><span class="p">,</span> <span class="nv">Ops</span><span class="p">}</span> <span class="o">=</span> <span class="n">sort</span><span class="p">(</span><span class="nv">Stack</span><span class="p">,</span> <span class="nn">lists</span><span class="p">:</span><span class="n">sort</span><span class="p">(</span><span class="nv">Stack</span><span class="p">)),</span>
+    <span class="p">{</span><span class="nv">Sorted</span><span class="p">,</span> <span class="nn">lists</span><span class="p">:</span><span class="n">reverse</span><span class="p">(</span><span class="nv">Ops</span><span class="p">)}.</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <h3>Internal Functions</h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p>Interpret a single line of input from stdin using <code>parse/1</code> and <code>clean/1</code> to 
+sanitise the input and turn it into a list of valid integers.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">read</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">iolist</span><span class="p">().</span>
+<span class="nf">read</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">parse</span><span class="p">(</span><span class="n">clean</span><span class="p">(</span><span class="nn">io</span><span class="p">:</span><span class="n">get_line</span><span class="p">(</span><span class="s">&quot;Pankcakes!: &quot;</span><span class="p">))).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p>Strip leading/trailing spaces and newlines from both ends of the input.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">clean</span><span class="p">(</span><span class="n">iolist</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="n">string</span><span class="p">().</span>
+<span class="nf">clean</span><span class="p">(</span><span class="nv">Input</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nn">string</span><span class="p">:</span><span class="n">strip</span><span class="p">(</span><span class="nn">string</span><span class="p">:</span><span class="n">strip</span><span class="p">(</span><span class="nv">Input</span><span class="p">),</span> <span class="n">both</span><span class="p">,</span> <span class="sc">$\n</span><span class="p">).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <p>Convert each token to a string accumulating the <em>valid</em> <em>unique</em> results by
+calling <code>validate/2</code> and <code>unique/1</code> respectively.
+Returns the first 30 diameters from the reversed accumulator once there are
+no more tokens to process.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">parse</span><span class="p">(</span><span class="n">string</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="n">integer</span><span class="p">()].</span>
+<span class="nf">parse</span><span class="p">(</span><span class="nv">Input</span><span class="p">)</span>      <span class="o">-&gt;</span> <span class="n">parse</span><span class="p">(</span><span class="nn">string</span><span class="p">:</span><span class="n">tokens</span><span class="p">(</span><span class="nv">Input</span><span class="p">,</span> <span class="s">&quot; &quot;</span><span class="p">),</span> <span class="p">[]).</span>
+
+<span class="p">-</span><span class="ni">spec</span> <span class="n">parse</span><span class="p">(</span><span class="n">list</span><span class="p">(),</span> <span class="p">[</span><span class="n">integer</span><span class="p">()])</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="n">integer</span><span class="p">()].</span>
+<span class="nf">parse</span><span class="p">([],</span> <span class="nv">Acc</span><span class="p">)</span>    <span class="o">-&gt;</span> <span class="n">uniques</span><span class="p">(</span><span class="nn">lists</span><span class="p">:</span><span class="n">sublist</span><span class="p">(</span><span class="nn">lists</span><span class="p">:</span><span class="n">reverse</span><span class="p">(</span><span class="nv">Acc</span><span class="p">),</span> <span class="mi">30</span><span class="p">));</span>
+<span class="nf">parse</span><span class="p">([</span><span class="nv">H</span><span class="p">|</span><span class="nv">T</span><span class="p">],</span> <span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">parse</span><span class="p">(</span><span class="nv">T</span><span class="p">,</span> <span class="n">validate</span><span class="p">(</span><span class="nn">string</span><span class="p">:</span><span class="n">to_integer</span><span class="p">(</span><span class="nv">H</span><span class="p">),</span> <span class="nv">Acc</span><span class="p">)).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      <p>Filter the result of <code>string:to_integer/1</code> by accumulating valid integers 
+that are inside the range specified in the <code>guard</code> and ignoring all others.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">validate</span><span class="p">({</span><span class="n">&#39;error&#39;</span> <span class="p">|</span> <span class="n">integer</span><span class="p">(),</span> <span class="n">&#39;no_integer&#39;</span> <span class="p">|</span> <span class="n">&#39;not_a_list&#39;</span> <span class="p">|</span> <span class="n">string</span><span class="p">()},</span> 
+	       <span class="p">[</span><span class="n">pos_integer</span><span class="p">()])</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="n">pos_integer</span><span class="p">()].</span>
+<span class="nf">validate</span><span class="p">({</span><span class="nv">Int</span><span class="p">,</span> <span class="p">_},</span> <span class="nv">Acc</span><span class="p">)</span> <span class="k">when</span> <span class="nb">is_integer</span><span class="p">(</span><span class="nv">Int</span><span class="p">),</span> <span class="nv">Int</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">Int</span> <span class="o">=&lt;</span> <span class="mi">100</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="nv">Int</span><span class="p">|</span><span class="nv">Acc</span><span class="p">];</span>
+<span class="nf">validate</span><span class="p">(_,</span> <span class="nv">Acc</span><span class="p">)</span>                                                   <span class="o">-&gt;</span> <span class="nv">Acc</span><span class="p">.</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      <p>Create a duplicate free list via an inefficient but cute list comprehension.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">uniques</span><span class="p">(</span><span class="n">list</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="n">list</span><span class="p">().</span>
+<span class="nf">uniques</span><span class="p">([])</span>    <span class="o">-&gt;</span> <span class="p">[];</span>
+<span class="nf">uniques</span><span class="p">([</span><span class="nv">H</span><span class="p">|</span><span class="nv">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="nv">H</span> <span class="p">|</span> <span class="p">[</span><span class="nv">X</span> <span class="p">||</span> <span class="nv">X</span> <span class="o">&lt;-</span> <span class="n">uniques</span><span class="p">(</span><span class="nv">T</span><span class="p">),</span> <span class="nv">X</span> <span class="o">/=</span> <span class="nv">H</span><span class="p">]].</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-14'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-14'>#</a>
+      </div>
+      <p>Format the number of operations (with a special case for <code>0</code>) according to
+question brief output. For example the operations: <code>4 5 3 0</code> becomes output: <code>1 2 3 0</code>.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">count</span><span class="p">([</span><span class="n">integer</span><span class="p">()])</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="n">integer</span><span class="p">()].</span>
+<span class="nf">count</span><span class="p">(</span><span class="nv">Ops</span><span class="p">)</span>              <span class="o">-&gt;</span> <span class="n">count</span><span class="p">(</span><span class="nv">Ops</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[]).</span>
+
+<span class="p">-</span><span class="ni">spec</span> <span class="n">count</span><span class="p">([</span><span class="n">integer</span><span class="p">()],</span> <span class="n">integer</span><span class="p">(),</span> <span class="p">[</span><span class="n">integer</span><span class="p">()])</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="n">integer</span><span class="p">()].</span>
+<span class="nf">count</span><span class="p">([],</span> <span class="p">_,</span> <span class="nv">Acc</span><span class="p">)</span>       <span class="o">-&gt;</span> <span class="nn">lists</span><span class="p">:</span><span class="n">reverse</span><span class="p">(</span><span class="nv">Acc</span><span class="p">);</span>
+<span class="nf">count</span><span class="p">([</span><span class="mi">0</span><span class="p">|</span><span class="nv">T</span><span class="p">],</span> <span class="nv">Iter</span><span class="p">,</span> <span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">count</span><span class="p">(</span><span class="nv">T</span><span class="p">,</span> <span class="nv">Iter</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">|</span><span class="nv">Acc</span><span class="p">]);</span>
+<span class="nf">count</span><span class="p">([_|</span><span class="nv">T</span><span class="p">],</span> <span class="nv">Iter</span><span class="p">,</span> <span class="nv">Acc</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">count</span><span class="p">(</span><span class="nv">T</span><span class="p">,</span> <span class="nv">Iter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="nv">Iter</span><span class="p">|</span><span class="nv">Acc</span><span class="p">]).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-15'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-15'>#</a>
+      </div>
+      <p>Print the resulting pancake stack in a nicer 'non-erlang-termerised' format
+with a heading column by using the term formatter <code>~p</code> for each integer in the stack.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">print</span><span class="p">([</span><span class="n">list</span><span class="p">()],</span> <span class="n">string</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="n">&#39;ok&#39;</span><span class="p">.</span>
+<span class="nf">print</span><span class="p">(</span><span class="nv">Stack</span><span class="p">,</span> <span class="nv">Heading</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="nn">io</span><span class="p">:</span><span class="n">fwrite</span><span class="p">(</span><span class="s">&quot;~-12.s&quot;</span><span class="p">,</span> <span class="p">[</span><span class="nv">Heading</span> <span class="o">++</span> <span class="s">&quot;:&quot;</span><span class="p">]),</span>
+    <span class="n">print</span><span class="p">(</span><span class="nv">Stack</span><span class="p">).</span>
+
+<span class="p">-</span><span class="ni">spec</span> <span class="n">print</span><span class="p">([</span><span class="n">integer</span><span class="p">()])</span> <span class="o">-&gt;</span> <span class="n">&#39;ok&#39;</span><span class="p">.</span>
+<span class="nf">print</span><span class="p">(</span><span class="nv">Stack</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="nn">io</span><span class="p">:</span><span class="n">fwrite</span><span class="p">(</span><span class="nn">string</span><span class="p">:</span><span class="n">copies</span><span class="p">(</span><span class="s">&quot;</span><span class="si">~p</span><span class="s"> &quot;</span><span class="p">,</span> <span class="nb">length</span><span class="p">(</span><span class="nv">Stack</span><span class="p">))</span> <span class="o">++</span> <span class="s">&quot;</span><span class="si">~n</span><span class="s">&quot;</span><span class="p">,</span> <span class="nv">Stack</span><span class="p">).</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-16'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-16'>#</a>
+      </div>
+      <p>Naive sort by always looking for the largest pancake first,
+and since it takes max of two flips for any additional sorting -
+best, average, and worst cases are all roughly equivalent. 
+Returns the sorted stack and the list of operations (in reverse order) that
+were used to transform the input stack -&gt; output. <code>0</code> will be at the head
+of the list indicating that the stack was sorted according to the order
+specification that was passed in.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">sort</span><span class="p">([</span><span class="n">integer</span><span class="p">()],</span> <span class="p">[</span><span class="n">integer</span><span class="p">()])</span> <span class="o">-&gt;</span> <span class="p">{[</span><span class="n">integer</span><span class="p">()],</span> <span class="p">[</span><span class="n">integer</span><span class="p">()]}.</span>
+<span class="nf">sort</span><span class="p">([],</span> <span class="p">_)</span>              <span class="o">-&gt;</span> <span class="p">{[],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]};</span>
+<span class="nf">sort</span><span class="p">(</span><span class="nv">Stack</span><span class="p">,</span> <span class="nv">Stack</span><span class="p">)</span>       <span class="o">-&gt;</span> <span class="p">{</span><span class="nv">Stack</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]};</span>
+<span class="nf">sort</span><span class="p">(</span><span class="nv">Stack</span><span class="o">=</span><span class="p">[</span><span class="nv">H</span><span class="p">|_],</span> <span class="nv">Order</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="nv">Length</span> <span class="o">=</span> <span class="nb">length</span><span class="p">(</span><span class="nv">Stack</span><span class="p">),</span>
+    <span class="nv">Last</span> <span class="o">=</span> <span class="nn">lists</span><span class="p">:</span><span class="n">last</span><span class="p">(</span><span class="nv">Stack</span><span class="p">),</span>
+    <span class="nv">Ops</span> <span class="o">=</span> <span class="k">case</span> <span class="nn">lists</span><span class="p">:</span><span class="n">max</span><span class="p">(</span><span class="nv">Stack</span><span class="p">)</span> <span class="k">of</span>
+      	      <span class="nv">H</span>    <span class="o">-&gt;</span> <span class="p">[</span><span class="nv">Length</span><span class="p">];</span>
+      	      <span class="nv">Last</span> <span class="o">-&gt;</span> <span class="p">[];</span>
+	      <span class="nv">Max</span>  <span class="o">-&gt;</span> <span class="p">[</span><span class="n">position</span><span class="p">(</span><span class="nv">Max</span><span class="p">,</span> <span class="nv">Stack</span><span class="p">),</span> <span class="nv">Length</span><span class="p">]</span>
+	  <span class="k">end</span><span class="p">,</span>
+    <span class="p">{</span><span class="nv">NewStack</span><span class="p">,</span> <span class="nv">CompletedOps</span><span class="p">}</span> <span class="o">=</span> <span class="n">flip</span><span class="p">(</span><span class="nv">Ops</span><span class="p">,</span> <span class="nv">Stack</span><span class="p">),</span>
+    <span class="n">sort</span><span class="p">(</span><span class="nv">Length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">NewStack</span><span class="p">,</span> <span class="nv">Order</span><span class="p">,</span> <span class="nv">CompletedOps</span><span class="p">).</span>
+
+<span class="p">-</span><span class="ni">spec</span> <span class="n">sort</span><span class="p">(</span><span class="n">integer</span><span class="p">(),</span> <span class="p">[</span><span class="n">integer</span><span class="p">()],</span>  <span class="p">[</span><span class="n">integer</span><span class="p">()],</span>  <span class="p">[</span><span class="n">integer</span><span class="p">()])</span> <span class="o">-&gt;</span> <span class="p">{</span> <span class="p">[</span><span class="n">integer</span><span class="p">()],</span>  <span class="p">[</span><span class="n">integer</span><span class="p">()]}.</span>
+<span class="nf">sort</span><span class="p">(_,</span> <span class="p">[],</span> <span class="p">_,</span> <span class="nv">Ops</span><span class="p">)</span>           <span class="o">-&gt;</span> <span class="p">{[],</span> <span class="nv">Ops</span><span class="p">};</span>
+<span class="nf">sort</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nv">Stack</span><span class="p">,</span> <span class="p">_,</span> <span class="nv">Ops</span><span class="p">)</span>        <span class="o">-&gt;</span> <span class="p">{</span><span class="nv">Stack</span><span class="p">,</span> <span class="nv">Ops</span><span class="p">};</span>
+<span class="nf">sort</span><span class="p">(_,</span> <span class="nv">Stack</span><span class="p">,</span> <span class="nv">Stack</span><span class="p">,</span> <span class="nv">Ops</span><span class="p">)</span>    <span class="o">-&gt;</span> <span class="p">{</span><span class="nv">Stack</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">|</span><span class="nv">Ops</span><span class="p">]};</span>
+<span class="nf">sort</span><span class="p">(</span><span class="nv">Iter</span><span class="p">,</span> <span class="nv">Stack</span><span class="p">,</span> <span class="nv">Order</span><span class="p">,</span> <span class="nv">Ops</span><span class="p">)</span> <span class="o">-&gt;</span> 
+    <span class="p">{</span><span class="nv">NewStack</span><span class="p">,</span> <span class="nv">CompletedOps</span><span class="p">}</span> <span class="o">=</span> <span class="n">flip</span><span class="p">([</span><span class="n">position</span><span class="p">(</span><span class="nv">Iter</span><span class="p">,</span> <span class="nv">Stack</span><span class="p">),</span> <span class="nv">Iter</span><span class="p">],</span> <span class="nv">Stack</span><span class="p">,</span> <span class="nv">Ops</span><span class="p">),</span>
+    <span class="n">sort</span><span class="p">(</span><span class="nv">Iter</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">NewStack</span><span class="p">,</span> <span class="nv">Order</span><span class="p">,</span> <span class="nv">CompletedOps</span><span class="p">).</span>  </pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-17'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-17'>#</a>
+      </div>
+      <p>Find the position of a flapjack in the stack by recursively pattern matching
+on each element of the list from left to right.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">position</span><span class="p">(</span><span class="n">integer</span><span class="p">(),</span> <span class="p">[</span><span class="n">integer</span><span class="p">()])</span> <span class="o">-&gt;</span> <span class="n">integer</span><span class="p">().</span>
+<span class="nf">position</span><span class="p">(_,</span> <span class="p">[])</span>     <span class="o">-&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span> 
+<span class="nf">position</span><span class="p">(</span><span class="nv">N</span><span class="p">,</span> <span class="p">[</span><span class="nv">N</span><span class="p">|_])</span>  <span class="o">-&gt;</span> <span class="mi">1</span><span class="p">;</span> 
+<span class="nf">position</span><span class="p">(</span><span class="nv">N</span><span class="p">,</span> <span class="p">[_|</span><span class="nv">T</span><span class="p">])</span>  <span class="o">-&gt;</span> <span class="n">position</span><span class="p">(</span><span class="nv">N</span><span class="p">,</span> <span class="nv">T</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">.</span> </pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-18'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-18'>#</a>
+      </div>
+      <p>Flip the stack according to the <code>flip</code> algorithm described in the problem brief.
+Trying to flip the first pankcake is considered a noop and isn't recorded 
+as an operation. The list is split using <code>lists:split/2</code> and then the top part 
+(the sub-stack on the spatula) is reversed using <code>lists:reverse/1</code>, the position 
+is then either accumulated or return as the operation performed.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">-</span><span class="ni">spec</span> <span class="n">flip</span><span class="p">([</span><span class="n">integer</span><span class="p">()],</span> <span class="p">[</span><span class="n">integer</span><span class="p">()])</span> <span class="o">-&gt;</span> <span class="p">{[</span><span class="n">integer</span><span class="p">()],</span> <span class="p">[</span><span class="n">integer</span><span class="p">()]}.</span>
+<span class="nf">flip</span><span class="p">(</span><span class="nv">Input</span><span class="p">,</span> <span class="nv">Stack</span><span class="p">)</span>         <span class="o">-&gt;</span> <span class="n">flip</span><span class="p">(</span><span class="nv">Input</span><span class="p">,</span> <span class="nv">Stack</span><span class="p">,</span> <span class="p">[]).</span>
+
+<span class="p">-</span><span class="ni">spec</span> <span class="n">flip</span><span class="p">([</span><span class="n">integer</span><span class="p">()]</span> <span class="p">|</span> <span class="n">integer</span><span class="p">(),</span> <span class="p">[</span><span class="n">integer</span><span class="p">()],</span> <span class="p">[</span><span class="n">integer</span><span class="p">()])</span> <span class="o">-&gt;</span> <span class="p">{[</span><span class="n">integer</span><span class="p">()],</span> <span class="p">[</span><span class="n">integer</span><span class="p">()]}.</span>
+<span class="nf">flip</span><span class="p">([],</span> <span class="nv">Stack</span><span class="p">,</span> <span class="nv">Ops</span><span class="p">)</span>       <span class="o">-&gt;</span> <span class="p">{</span><span class="nv">Stack</span><span class="p">,</span> <span class="nv">Ops</span><span class="p">};</span>
+<span class="nf">flip</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nv">Stack</span><span class="p">,</span> <span class="nv">Ops</span><span class="p">)</span>        <span class="o">-&gt;</span> <span class="p">{</span><span class="nv">Stack</span><span class="p">,</span> <span class="nv">Ops</span><span class="p">};</span>
+<span class="nf">flip</span><span class="p">([</span><span class="nv">H</span><span class="p">|</span><span class="nv">T</span><span class="p">],</span> <span class="nv">Stack</span><span class="p">,</span> <span class="nv">Ops</span><span class="p">)</span>    <span class="o">-&gt;</span> 
+    <span class="p">{</span><span class="nv">NewStack</span><span class="p">,</span> <span class="nv">NewOps</span><span class="p">}</span> <span class="o">=</span> <span class="n">flip</span><span class="p">(</span><span class="nv">H</span><span class="p">,</span> <span class="nv">Stack</span><span class="p">,</span> <span class="nv">Ops</span><span class="p">),</span>
+    <span class="n">flip</span><span class="p">(</span><span class="nv">T</span><span class="p">,</span> <span class="nv">NewStack</span><span class="p">,</span> <span class="nv">NewOps</span><span class="p">);</span>
+<span class="nf">flip</span><span class="p">(</span><span class="nv">Position</span><span class="p">,</span> <span class="nv">Stack</span><span class="p">,</span> <span class="nv">Ops</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="p">{</span><span class="nv">Top</span><span class="p">,</span> <span class="nv">Bottom</span><span class="p">}</span> <span class="o">=</span> <span class="nn">lists</span><span class="p">:</span><span class="n">split</span><span class="p">(</span><span class="nv">Position</span><span class="p">,</span> <span class="nv">Stack</span><span class="p">),</span>
+    <span class="p">{</span><span class="nn">lists</span><span class="p">:</span><span class="n">reverse</span><span class="p">(</span><span class="nv">Top</span><span class="p">)</span> <span class="o">++</span> <span class="nv">Bottom</span><span class="p">,</span> <span class="p">[</span><span class="nv">Position</span><span class="p">|</span><span class="nv">Ops</span><span class="p">]}.</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

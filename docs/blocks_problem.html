@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>blocks_problem.py</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id="background"></div>
+<div id='container'>
+  
+  <div class='section'>
+    <div class='docs'><h1>blocks_problem.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      <p>A semi-literate-programming Python solution for the <strong>Blocks Problem</strong>
+problem from <a href="http://#www.streamtech.nl/problemset/101.html">streamtech's</a> 
+problem set by <a href="http://#www.github.com/brendanhay">Brendan Hay</a>. </p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <h3>Brief</h3>
+<h4>Background</h4>
+<p>Many areas of Computer Science use simple, abstract domains for both analytical
+and empirical studies. For example, an early AI study of planning and robotics
+(STRIPS) used a block world in which a robot arm performed tasks involving the
+manipulation of blocks.</p>
+<p>In this problem you will model a simple block world under certain rules and constraints.
+Rather than determine how to achieve a specified state, you will ``program'' a robotic
+arm to respond to a limited set of commands.</p>
+<h4>Problem</h4>
+<p>The problem is to parse a series of commands that instruct a robot arm in how to
+manipulate blocks that lie on a flat table. Initially there are n blocks on the table
+(numbered from 0 to n-1) with block bi adjacent to block bi+1 for all as shown
+in the diagram below:</p>
+<pre><code>0 1 2 3 4 ... n-1
+</code></pre>
+<p>The valid commands for the robot arm that manipulates blocks are:</p>
+<ul>
+<li><code>move a onto b</code>
+  <em>where a and b are block numbers, puts block a onto block b after returning
+  any blocks that are stacked on top of blocks a and b to their initial positions.</em></li>
+<li><code>move a over b</code>
+  <em>where a and b are block numbers, puts block a onto the top of the stack containing
+  block b, after returning any blocks that are stacked on top of block a to their initial positions.</em></li>
+<li><code>pile a onto b</code>
+  <em>where a and b are block numbers, moves the pile of blocks consisting of block a,
+  and any blocks that are stacked above block a, onto block b. All blocks on top of
+  block b are moved to their initial positions prior to the pile taking place. The blocks
+  stacked above block a retain their order when moved.</em></li>
+<li><code>pile a over b</code>
+  <em>where a and b are block numbers, puts the pile of blocks consisting of block a,
+  and any blocks that are stacked above block a, onto the top of the stack containing
+  block b. The blocks stacked above block a retain their original order when moved.</em></li>
+<li><code>quit</code>
+  <em>terminates manipulations in the block world.</em></li>
+</ul>
+<p>Any command in which a = b or in which a and b are in the same stack of blocks
+is an illegal command. All illegal commands should be ignored and should have no
+affect on the configuration of blocks.</p>
+<h4>Input</h4>
+<h4>Output</h4>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <h3>Running</h3>
+<p>Python is required, and can be downloaded from
+<a href="http://python.org/download/">the official site</a>.</p>
+<p>Assuming your prompt is in the same location as the problem file and
+the data file <code>blocks_problem.txt</code></p>
+<pre><code>$ python blocks_problem.py
+</code></pre>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <p>Regular expression module so regexs can be used as a poor mans tokenizer for the input statements.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kn">import</span> <span class="nn">re</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p><code>Blocks</code> class defines the initial setup and layout of the stacks of blocks,
+performs the execution of commands, and pretty printing of the current state of the stacks.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">Blocks</span><span class="p">():</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <p>Initialise the <code>Blocks</code> instance with a list of stacks of blocks,
+ala: <code>[[0], [1], [2], ...</code> bounded by <code>size</code>.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">commands</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stacks</span> <span class="o">=</span> <span class="p">[[</span><span class="n">block</span><span class="p">]</span> <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">size</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">commands</span> <span class="o">=</span> <span class="n">commands</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <p>Pretty print the current stack/block state according to the problem brief.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">stack</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="n">blocks</span> <span class="o">=</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stacks</span><span class="p">[</span><span class="n">stack</span><span class="p">])</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&quot;</span><span class="si">%d</span><span class="s">: &quot;</span> <span class="o">%</span> <span class="n">stack</span><span class="p">,</span> <span class="n">blocks</span><span class="p">]))</span>
+
+        <span class="k">return</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>Find which stack a block is currently residing in.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__find_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">stack</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stacks</span><span class="p">[</span><span class="n">stack</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">b</span> <span class="o">==</span> <span class="n">block</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">stack</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <p>Reset any blocks following contained in <code>stack</code> to their original positions.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__reset_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stack</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>
+        <span class="n">blocks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stacks</span><span class="p">[</span><span class="n">stack</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stacks</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="p">]</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p>Move a block and any followers from <code>stack_from</code> to <code>stack_to</code> via ginsu slicing.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__move_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stack_from</span><span class="p">,</span> <span class="n">stack_to</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>
+        <span class="n">blocks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stacks</span><span class="p">[</span><span class="n">stack_from</span><span class="p">]</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">blocks</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">block</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">stacks</span><span class="p">[</span><span class="n">stack_from</span><span class="p">]</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[:</span><span class="n">position</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stacks</span><span class="p">[</span><span class="n">stack_to</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">blocks</span><span class="p">[</span><span class="n">position</span><span class="p">:])</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p>All commands invoke <code>__command</code> which handles validation of the arguments
+and manipulation of the source and destination stacks.
+<strong>Brief</strong>: Any command in which a = b or in which a and b are in the same stack of blocks
+is an illegal command. All illegal commands should be ignored and should have no
+affect on the configuration of blocks.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">reset_a</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">reset_b</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">stack_a</span><span class="p">,</span> <span class="n">stack_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__find_stack</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">__find_stack</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span> <span class="ow">or</span> <span class="n">stack_a</span> <span class="o">==</span> <span class="n">stack_b</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">reset_a</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__reset_stack</span><span class="p">(</span><span class="n">stack_a</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">reset_b</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__reset_stack</span><span class="p">(</span><span class="n">stack_b</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__move_block</span><span class="p">(</span><span class="n">stack_a</span><span class="p">,</span> <span class="n">stack_b</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <p>Execute all commands in <code>self.commands</code> by matching the command name against a
+public function name, applying <code>a</code> and <code>b</code> as arguments.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">command</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">commands</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">a</span> <span class="o">!=</span> <span class="n">b</span><span class="p">:</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">)(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      <p><em>move a onto b</em></p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">move_onto</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__command</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">reset_a</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">reset_b</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      <p><em>move a over b</em></p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">move_over</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__command</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">reset_a</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    </pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-14'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-14'>#</a>
+      </div>
+      <p><em>pile a over b</em></p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">pile_over</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__command</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">reset_b</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    </pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-15'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-15'>#</a>
+      </div>
+      <p><em>pile a onto b</em></p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">pile_onto</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__command</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-16'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-16'>#</a>
+      </div>
+      <p><code>Parser</code> class for reading program statements from a file and tokenizing those statements
+into valid commands for the <code>Blocks</code> class.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">Parser</span><span class="p">():</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-17'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-17'>#</a>
+      </div>
+      <p>Initialise the <code>Parser</code> with the specified regular expression as the tokenizer.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">tokenizer</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-18'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-18'>#</a>
+      </div>
+      <p>Generator for opening and scanning <code>file_name</code>, chunking together a
+statement from <code>size</code> until <code>quit</code> is encountered, at which point the
+statement is yeilded as a single line.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__scan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+        <span class="n">statement</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;quit&quot;</span><span class="p">):</span>
+                <span class="n">statement</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">statement</span><span class="p">)</span>            
+
+                <span class="k">del</span> <span class="n">statement</span><span class="p">[:]</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-19'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-19'>#</a>
+      </div>
+      <p>Tokenize a statement into <code>Blocks</code> instance which is initialised with a
+<code>size</code> and a list of <code>commands</code> consisting of <code>method_name</code>, and two
+parameters <code>a</code> and <code>b</code> </p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__tokenize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">statement</span><span class="p">):</span>
+        <span class="n">size</span><span class="p">,</span> <span class="n">commands</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">statement</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s">&quot;size&quot;</span><span class="p">):</span>
+                <span class="n">size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s">&quot;size&quot;</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">token</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s">&quot;prefix&quot;</span><span class="p">),</span> <span class="n">token</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s">&quot;suffix&quot;</span><span class="p">)]),</span>
+                                 <span class="nb">int</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s">&quot;b&quot;</span><span class="p">))))</span>
+
+        <span class="k">return</span> <span class="n">Blocks</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">commands</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-20'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-20'>#</a>
+      </div>
+      <p>Public generator for yielding the result of scanning and tokenizing a
+single program statement from the supplied <code>file_name</code>.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">statement</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__scan</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tokenize</span><span class="p">(</span><span class="n">statement</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div><div class='section' id='section-21'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-21'>#</a>
+      </div>
+      <p>Open and parse the <code>blocks_problem.txt</code> file, executing commands and printing
+the resulting state for each program statement found.
+<code>tokenizer</code> is the regular expression (now we have two problems ..) for tokenizing
+the input lines into either a size or command tokens. </p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&quot;(?P&lt;size&gt;^\d+)|((?P&lt;prefix&gt;\w+) (?P&lt;a&gt;\d+) (?P&lt;suffix&gt;\w+) (?P&lt;b&gt;\d+))&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">blocks</span> <span class="ow">in</span> <span class="n">Parser</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&quot;blocks_problem.txt&quot;</span><span class="p">):</span>
+        <span class="n">blocks</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+
+        <span class="k">print</span> <span class="n">blocks</span>
+
+        
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>
